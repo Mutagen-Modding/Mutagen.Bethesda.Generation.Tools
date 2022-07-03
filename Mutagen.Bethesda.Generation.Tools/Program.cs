@@ -1,5 +1,6 @@
 ﻿using CommandLine;
 using Mutagen.Bethesda.Generation.Tools.FormLinks;
+using Mutagen.Bethesda.Generation.Tools.FormLinks.InclusionConfirmation;
 using Mutagen.Bethesda.Generation.Tools.Strings;
 using Mutagen.Bethesda.Generation.Tools.XEdit.Enum;
 

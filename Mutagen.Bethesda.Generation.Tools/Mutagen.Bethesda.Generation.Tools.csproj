@@ -9,9 +9,10 @@
 
 	<ItemGroup>
 		<PackageReference Include="CommandLineParser" Version="2.9.1" />
-		<PackageReference Include="Loqui.Generation" Version="2.47.0.1-dev" />
-		<PackageReference Include="Noggog.CSharpExt" Version="2.47.0.1-dev" />
-		<PackageReference Include="Mutagen.Bethesda" Version="0.37.0.1-dev" />
+		<PackageReference Include="Loqui.Generation" Version="2.48.0" />
+		<PackageReference Include="Noggog.Autofac" Version="2.48.0" />
+		<PackageReference Include="Noggog.CSharpExt" Version="2.48.0" />
+		<PackageReference Include="Mutagen.Bethesda" Version="0.37.1.1-dev" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -19,7 +20,7 @@
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="NuGetizer" Version="0.7.5">
+		<PackageReference Include="NuGetizer" Version="0.8.0">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
@@ -32,6 +33,16 @@
 	    <BuildAction>Compile</BuildAction>
 	  </Compile>
 	  <Compile Update="XEdit\Enum\EnumConverter.cs">
+	    <CodeLanguage>cs</CodeLanguage>
+	    <DefaultPackFolder>content</DefaultPackFolder>
+	    <BuildAction>Compile</BuildAction>
+	  </Compile>
+	  <Compile Update="FormLinks\InclusionConfirmation\FormLinkInclusionConfirmation.cs">
+	    <CodeLanguage>cs</CodeLanguage>
+	    <DefaultPackFolder>content</DefaultPackFolder>
+	    <BuildAction>Compile</BuildAction>
+	  </Compile>
+	  <Compile Update="Common\ModsToCheckProvider.cs">
 	    <CodeLanguage>cs</CodeLanguage>
 	    <DefaultPackFolder>content</DefaultPackFolder>
 	    <BuildAction>Compile</BuildAction>
