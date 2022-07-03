@@ -1,4 +1,5 @@
-﻿using Mutagen.Bethesda.Generation.Tools.Common;
+﻿using Loqui;
+using Mutagen.Bethesda.Generation.Tools.Common;
 using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Plugins.Records;
 using Noggog;
@@ -7,7 +8,7 @@ namespace Mutagen.Bethesda.Generation.Tools.FormLinks.InclusionConfirmation;
 
 public record ModSourceToMissingLinks
 {
-    public Dictionary<IFormLinkGetter, HashSet<FormKey>> SourceToMissingLinks { get; } = new();
+    public Dictionary<IFormLinkGetter, HashSet<IFormLinkGetter>> SourceToMissingLinks { get; } = new();
 }
 
 public record ModsSourceToMissingLinks
@@ -62,13 +63,22 @@ public class MissingLocator
                     // If not found at all, skip
                     if (!_environmentProvider.Environment.LinkCache.TryResolve(link.FormKey, typeof(IMajorRecordGetter), out var linked)) continue;
 
+                    var linkedType = linked.GetType();
+                    
+                    if (LoquiRegistration.TryGetRegister(linkedType, out var regis))
+                    {
+                        linkedType = regis.ClassType;
+                    }
+
+                    var recordType = LoquiRegistration.GetRegister(context.Record.GetType()).ClassType;
+                    
                     lock (missing)
                     {
-                        missing.SourceToMissingLinks.GetOrAdd(context.Record.GetType())
-                            .MissingLinkToMods.GetOrAdd(linked.GetType())
+                        missing.SourceToMissingLinks.GetOrAdd(recordType)
+                            .MissingLinkToMods.GetOrAdd(linkedType)
                             .Mods.GetOrAdd(context.ModKey)
                             .SourceToMissingLinks.GetOrAdd(context.Record.ToLinkFromRuntimeType())
-                            .Add(link.FormKey);
+                            .Add(link);
                     }
                 }
             }

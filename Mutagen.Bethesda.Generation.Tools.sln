@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mutagen.Bethesda.Generation.Tools", "Mutagen.Bethesda.Generation.Tools\Mutagen.Bethesda.Generation.Tools.csproj", "{0557959D-0B9C-4C4D-93B0-101FBF088704}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mutagen.Bethesda.Generation.Tools.Tests", "Mutagen.Bethesda.Generation.Tools.Tests\Mutagen.Bethesda.Generation.Tools.Tests.csproj", "{D8FE4ACA-517E-440F-B368-FB4B94799F23}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{0557959D-0B9C-4C4D-93B0-101FBF088704}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0557959D-0B9C-4C4D-93B0-101FBF088704}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0557959D-0B9C-4C4D-93B0-101FBF088704}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D8FE4ACA-517E-440F-B368-FB4B94799F23}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D8FE4ACA-517E-440F-B368-FB4B94799F23}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D8FE4ACA-517E-440F-B368-FB4B94799F23}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D8FE4ACA-517E-440F-B368-FB4B94799F23}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
