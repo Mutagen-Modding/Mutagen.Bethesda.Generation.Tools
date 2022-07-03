@@ -13,17 +13,23 @@ public class RunXEditEnumConverter
     public FilePath OutputFile { get; set; }
 
     [Option('t', "Type", Required = false)]
-    public EnumType FunctionEnum { get; set; } = EnumType.Normal;
+    public EnumType Type { get; set; } = EnumType.Normal;
 
     public async Task Execute()
     {
-        switch (FunctionEnum)
+        switch (Type)
         {
             case EnumType.Normal:
                 EnumConverter.Convert(SourceFile, OutputFile);
                 break;
+            case EnumType.Curly:
+                CurlyEnumConverter.Convert(SourceFile, OutputFile);
+                break;
             case EnumType.Function:
                 FunctionEnumGenerator.Convert(SourceFile, OutputFile);
+                break;
+            case EnumType.RecordType:
+                RecordTypeEnumConverter.Convert(SourceFile, OutputFile);
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
@@ -34,5 +40,7 @@ public class RunXEditEnumConverter
 public enum EnumType
 {
     Normal,
-    Function
+    Curly,
+    Function,
+    RecordType,
 }

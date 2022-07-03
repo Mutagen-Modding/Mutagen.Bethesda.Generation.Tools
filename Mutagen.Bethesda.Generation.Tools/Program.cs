@@ -10,7 +10,8 @@ try
             args,
             typeof(RunXEditEnumConverter),
             typeof(StringMappingFisher),
-            typeof(FormLinkTypeFisher))
+            typeof(FormLinkTypeFisher),
+            typeof(FormLinkInclusionConfirmation))
         .MapResult(
             async (RunXEditEnumConverter xEditEnum) =>
             {
@@ -23,6 +24,11 @@ try
                 return 0;
             },
             async (FormLinkTypeFisher fisher) =>
+            {
+                fisher.Execute();
+                return 0;
+            },
+            async (FormLinkInclusionConfirmation fisher) =>
             {
                 fisher.Execute();
                 return 0;

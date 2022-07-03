@@ -1,5 +1,6 @@
-using Loqui;
 using Noggog;
+using Noggog.StructuredStrings;
+using Noggog.StructuredStrings.CSharp;
 
 namespace Mutagen.Bethesda.Generation.Tools.XEdit.Enum;
 
@@ -17,14 +18,14 @@ public static class FunctionEnumGenerator
     /// </summary>
     public static void Convert(FilePath source, FilePath output)
     {
-        FileGeneration fg = new();
-        fg.AppendLine("public enum Function");
-        using (new BraceWrapper(fg))
+        StructuredStringBuilder sb = new();
+        sb.AppendLine("public enum Function");
+        using (sb.CurlyBrace())
         {
             foreach (var line in File.ReadLines(source))
             {
                 var span = line.AsSpan();
-                span = SkipPast(span, IndexStr);
+                span = EnumConverter.SkipPast(span, IndexStr);
             
                 var semiColonIndex = span.IndexOf(";");
                 if (semiColonIndex == -1)
@@ -37,14 +38,16 @@ public static class FunctionEnumGenerator
                     throw new ArgumentException();
                 }
 
-                span = SkipPast(span, NameStr);
+                span = EnumConverter.SkipPast(span, NameStr);
 
-                var name = span.Slice(0, span.IndexOf('\''));
+                var name = span.Slice(0, span.IndexOf('\'')).ToString();
 
-                fg.AppendLine($"{name} = {i},");
+                name = EnumConverter.CleanName(name);
+                
+                sb.AppendLine($"{name} = {i},");
             }
         }
-        fg.AppendLine();
+        sb.AppendLine();
 
         if (File.Exists(output))
         {
@@ -52,17 +55,6 @@ public static class FunctionEnumGenerator
         }
 
         using var outputStream = new StreamWriter(File.OpenWrite(output));
-        outputStream.Write(fg.ToString());
-    }
-
-    private static ReadOnlySpan<char> SkipPast(ReadOnlySpan<char> str, string target)
-    {
-        var index = str.IndexOf(target);
-        if (index == -1)
-        {
-            throw new ArgumentException();
-        }
-        
-        return str.Slice(index + target.Length);
+        outputStream.Write(sb.ToString());
     }
 }

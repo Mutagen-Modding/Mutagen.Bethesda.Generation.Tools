@@ -5,7 +5,7 @@ using Noggog.StructuredStrings.CSharp;
 
 namespace Mutagen.Bethesda.Generation.Tools.XEdit.Enum;
 
-public static class EnumConverter
+public static class CurlyEnumConverter
 {
     public static void Convert(FilePath source, FilePath output)
     {
@@ -16,8 +16,9 @@ public static class EnumConverter
             foreach (var line in File.ReadLines(source))
             {
                 var span = line.AsSpan();
+                span = EnumConverter.SkipPast(span, "{");
 
-                var numberEndIndex = span.IndexOf(",");
+                var numberEndIndex = span.IndexOf("}");
                 if (numberEndIndex == -1)
                 {
                     throw new ArgumentException();
@@ -41,13 +42,13 @@ public static class EnumConverter
                     throw new ArgumentException();
                 }
 
-                span = SkipPast(span, ", '");
+                span = EnumConverter.SkipPast(span, "} '");
 
-                var name = span.Slice(0, span.IndexOf("\',")).ToString();
+                var name = span.Slice(0, span.IndexOf('\'')).ToString();
 
                 if (name.Contains("Unknown")) continue;
 
-                name = CleanName(name);
+                name = EnumConverter.CleanName(name);
 
                 sb.AppendLine($"{name} = {(hex ? $"0x{i:x}" : i)},");
             }
@@ -61,26 +62,5 @@ public static class EnumConverter
 
         using var outputStream = new StreamWriter(File.OpenWrite(output));
         outputStream.Write(sb.ToString());
-    }
-
-    public static ReadOnlySpan<char> SkipPast(ReadOnlySpan<char> str, string target)
-    {
-        var index = str.IndexOf(target);
-        if (index == -1)
-        {
-            throw new ArgumentException();
-        }
-
-        return str.Slice(index + target.Length);
-    }
-
-    public static string CleanName(string name)
-    {
-        return name
-            .Replace(" ", string.Empty)
-            .Replace("/", "Or")
-            .Replace("-", string.Empty)
-            .Replace("'", string.Empty)
-            .Replace("\\", "Or");
     }
 }

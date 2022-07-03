@@ -1,19 +1,9 @@
-using System.Diagnostics;
 using CommandLine;
-using Loqui;
 using Mutagen.Bethesda.Environments;
-using Mutagen.Bethesda.Environments.DI;
-using Mutagen.Bethesda.Fallout4;
-using Mutagen.Bethesda.Installs;
 using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Plugins.Analysis;
 using Mutagen.Bethesda.Plugins.Binary.Streams;
-using Mutagen.Bethesda.Plugins.Cache.Internals.Implementations;
-using Mutagen.Bethesda.Plugins.Implicit.DI;
-using Mutagen.Bethesda.Plugins.Order.DI;
 using Mutagen.Bethesda.Plugins.Records;
-using Mutagen.Bethesda.Plugins.Records.DI;
-using Mutagen.Bethesda.Plugins.Records.Mapping;
 using Mutagen.Bethesda.Plugins.Utility;
 using Mutagen.Bethesda.Strings;
 using Noggog;
@@ -114,7 +104,7 @@ public class StringMappingFisher
         foreach (var recordLocationMarker in locs.ListedRecords)
         {
             stream.Position = recordLocationMarker.Key;
-            var origMajorFrame = stream.ReadMajorRecordFrame();
+            var origMajorFrame = stream.ReadMajorRecord();
             var majorFrame = origMajorFrame;
             if (majorFrame.IsCompressed)
             {

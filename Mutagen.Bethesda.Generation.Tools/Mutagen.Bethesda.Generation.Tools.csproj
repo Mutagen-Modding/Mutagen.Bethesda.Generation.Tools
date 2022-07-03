@@ -8,9 +8,9 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="CommandLineParser" Version="2.8.0" />
-		<PackageReference Include="Loqui.Generation" Version="2.40.0.1-dev" />
-		<PackageReference Include="Noggog.CSharpExt" Version="2.40.0.1-dev" />
+		<PackageReference Include="CommandLineParser" Version="2.9.1" />
+		<PackageReference Include="Loqui.Generation" Version="2.47.0.1-dev" />
+		<PackageReference Include="Noggog.CSharpExt" Version="2.47.0.1-dev" />
 		<PackageReference Include="Mutagen.Bethesda" Version="0.37.0.1-dev" />
 	</ItemGroup>
 
@@ -27,6 +27,11 @@
 
 	<ItemGroup>
 	  <Compile Update="XEdit\Enum\RunXEditEnumConverter.cs">
+	    <CodeLanguage>cs</CodeLanguage>
+	    <DefaultPackFolder>content</DefaultPackFolder>
+	    <BuildAction>Compile</BuildAction>
+	  </Compile>
+	  <Compile Update="XEdit\Enum\EnumConverter.cs">
 	    <CodeLanguage>cs</CodeLanguage>
 	    <DefaultPackFolder>content</DefaultPackFolder>
 	    <BuildAction>Compile</BuildAction>
