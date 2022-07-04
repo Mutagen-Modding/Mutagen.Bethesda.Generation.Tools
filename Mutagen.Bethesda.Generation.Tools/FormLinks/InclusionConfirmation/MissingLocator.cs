@@ -53,9 +53,9 @@ public class MissingLocator
         {
             foreach (var context in mod.EnumerateMajorRecordSimpleContexts(_targetTypeProvider.GetTargetType()))
             {
-                if (_exclusionsProvider.Exclude(context.Record.FormKey)) continue;
                 foreach (var link in context.Record.EnumerateFormLinks())
                 {
+                    if (_exclusionsProvider.Exclude(mod.ModKey, context.Record.ToStandardizedIdentifier(), link.FormKey)) continue;
                     // If null, skip
                     if (link.IsNull) continue;
                     // If found in typed constraints, skip

@@ -1,0 +1,20 @@
+{
+  "Items": [
+    {
+      "SourceRecord": "045718:DLCNukaWorld.esm<Fallout4.PlacedObject>",
+      "MissingLink": "03155A:DLCNukaWorld.esm"
+    },
+    {
+      "SourceRecord": "04559B:DLCNukaWorld.esm<Fallout4.PlacedObject>",
+      "MissingLink": "030BF1:DLCNukaWorld.esm"
+    },
+    {
+      "SourceRecord": "04558C:DLCNukaWorld.esm<Fallout4.PlacedObject>",
+      "MissingLink": "030BD9:DLCNukaWorld.esm"
+    },
+    {
+      "SourceRecord": "049066:DLCNukaWorld.esm<Fallout4.PlacedObject>",
+      "MissingLink": "006FCB:DLCNukaWorld.esm"
+    }
+  ]
+}

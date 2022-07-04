@@ -1,0 +1,16 @@
+{
+  "Items": [
+    {
+      "SourceRecord": "01A02F:Fallout4.esm<Fallout4.EquipType>",
+      "MissingLink": "00000E:Fallout4.esm"
+    },
+    {
+      "SourceRecord": "137820:Fallout4.esm<Fallout4.LeveledItem>",
+      "MissingLink": "18102D:Fallout4.esm"
+    },
+    {
+      "SourceRecord": "24A334:Fallout4.esm<Fallout4.ConstructibleObject>",
+      "MissingLink": "24A316:Fallout4.esm"
+    }
+  ]
+}

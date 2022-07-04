@@ -31,7 +31,7 @@ public class TrimmedMissingPrinter
                 var targetKey = formLink.Value.First();
                 var loc = new Stack<string>();
                 _locationRetriever.RetrieveLocationOf(rec, targetKey.FormKey, loc);
-                Console.WriteLine($"        {formLink.Key.FormKey} missing {targetKey} [{missingType.Key.Name}]: {string.Join(" -> ", loc.Reverse())}");
+                Console.WriteLine($"        [{missingType.Key.Name}]({missingType.Value.Mods.SelectMany(m => m.Value.SourceToMissingLinks).Count()}) {formLink.Key.FormKey} missing {targetKey}: {string.Join(" -> ", loc.Reverse())}");
             }
         }
     }

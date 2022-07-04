@@ -10,6 +10,7 @@
 	<ItemGroup>
 		<PackageReference Include="CommandLineParser" Version="2.9.1" />
 		<PackageReference Include="Loqui.Generation" Version="2.48.0" />
+		<PackageReference Include="Mutagen.Bethesda.Json" Version="0.37.1.1-dev" />
 		<PackageReference Include="Noggog.Autofac" Version="2.48.0" />
 		<PackageReference Include="Noggog.CSharpExt" Version="2.48.0" />
 		<PackageReference Include="Mutagen.Bethesda" Version="0.37.1.1-dev" />
