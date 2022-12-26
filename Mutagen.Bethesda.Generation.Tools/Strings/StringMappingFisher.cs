@@ -70,7 +70,7 @@ public class StringMappingFisher
         using var stream = new MutagenBinaryReadStream(path, Release);
         var modHeader = stream.ReadModHeader();
 
-        if (!EnumExt.HasFlag(modHeader.Flags, (int)ModHeaderCommonFlag.Localized))
+        if (!Enums.HasFlag(modHeader.Flags, (int)ModHeaderCommonFlag.Localized))
         {
             Console.WriteLine($"File is not localized, and so checker will not work as intended: {path}");
             return false;
@@ -116,7 +116,7 @@ public class StringMappingFisher
                 var key = subRec.AsUInt32();
                 if (key == 0) continue;
 
-                foreach (var source in EnumExt.GetValues<StringsSource>())
+                foreach (var source in Enums<StringsSource>.Values)
                 {
                     if (stringsOverlay.TryLookup(source, Language.English, key, out _))
                     {

@@ -16,7 +16,7 @@ public static class CurlyEnumConverter
             foreach (var line in File.ReadLines(source))
             {
                 var span = line.AsSpan();
-                span = EnumConverter.SkipPast(span, "{");
+                span = Utility.SkipPast(span, "{");
 
                 var numberEndIndex = span.IndexOf("}");
                 if (numberEndIndex == -1)
@@ -42,7 +42,7 @@ public static class CurlyEnumConverter
                     throw new ArgumentException();
                 }
 
-                span = EnumConverter.SkipPast(span, "} '");
+                span = Utility.SkipPast(span, "} '");
 
                 var name = span.Slice(0, span.IndexOf('\'')).ToString();
 

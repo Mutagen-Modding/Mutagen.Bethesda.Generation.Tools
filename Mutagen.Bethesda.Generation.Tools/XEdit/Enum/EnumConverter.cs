@@ -41,7 +41,7 @@ public static class EnumConverter
                     throw new ArgumentException();
                 }
 
-                span = SkipPast(span, ", '");
+                span = Utility.SkipPast(span, ", '");
 
                 var name = span.Slice(0, span.IndexOf("\',")).ToString();
 
@@ -61,17 +61,6 @@ public static class EnumConverter
 
         using var outputStream = new StreamWriter(File.OpenWrite(output));
         outputStream.Write(sb.ToString());
-    }
-
-    public static ReadOnlySpan<char> SkipPast(ReadOnlySpan<char> str, string target)
-    {
-        var index = str.IndexOf(target);
-        if (index == -1)
-        {
-            throw new ArgumentException();
-        }
-
-        return str.Slice(index + target.Length);
     }
 
     public static string CleanName(string name)

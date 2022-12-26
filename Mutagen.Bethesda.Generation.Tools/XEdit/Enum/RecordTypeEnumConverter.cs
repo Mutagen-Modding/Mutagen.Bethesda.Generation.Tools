@@ -17,7 +17,7 @@ public class RecordTypeEnumConverter
             foreach (var line in File.ReadLines(source))
             {
                 var span = line.AsSpan();
-                span = EnumConverter.SkipPast(span, "Sig2Int(");
+                span = Utility.SkipPast(span, "Sig2Int(");
 
                 var recordTypeIndex = span.IndexOf(")");
                 if (recordTypeIndex == -1)
@@ -33,7 +33,7 @@ public class RecordTypeEnumConverter
 
                 var recordType = new RecordType(recordTypeSpan);
 
-                span = EnumConverter.SkipPast(span, ", '");
+                span = Utility.SkipPast(span, ", '");
 
                 var name = span.Slice(0, span.IndexOf('\'')).ToString();
 

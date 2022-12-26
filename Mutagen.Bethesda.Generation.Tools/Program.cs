@@ -2,6 +2,7 @@
 using Mutagen.Bethesda.Generation.Tools.FormLinks;
 using Mutagen.Bethesda.Generation.Tools.FormLinks.InclusionConfirmation;
 using Mutagen.Bethesda.Generation.Tools.Strings;
+using Mutagen.Bethesda.Generation.Tools.XEdit;
 using Mutagen.Bethesda.Generation.Tools.XEdit.Enum;
 
 try
@@ -10,11 +11,17 @@ try
     return await parser.ParseArguments(
             args,
             typeof(RunXEditEnumConverter),
+            typeof(RunXEditConditionFunctionGenerator),
             typeof(StringMappingFisher),
             typeof(FormLinkTypeFisher),
             typeof(FormLinkInclusionConfirmation))
         .MapResult(
             async (RunXEditEnumConverter xEditEnum) =>
+            {
+                await xEditEnum.Execute();
+                return 0;
+            },
+            async (RunXEditConditionFunctionGenerator xEditEnum) =>
             {
                 await xEditEnum.Execute();
                 return 0;

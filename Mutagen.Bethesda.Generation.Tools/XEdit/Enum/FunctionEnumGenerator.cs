@@ -9,8 +9,8 @@ namespace Mutagen.Bethesda.Generation.Tools.XEdit.Enum;
 /// </summary>
 public static class FunctionEnumGenerator
 {
-    private const string IndexStr = "Index:";
-    private const string NameStr = "Name: '";
+    public const string IndexStr = "Index:";
+    public const string NameStr = "Name: '";
     
     /// <summary>
     /// Expects files with lines like
@@ -22,29 +22,9 @@ public static class FunctionEnumGenerator
         sb.AppendLine("public enum Function");
         using (sb.CurlyBrace())
         {
-            foreach (var line in File.ReadLines(source))
+            foreach (var line in new ConditionFunctionParser().ReadFunctions(source))
             {
-                var span = line.AsSpan();
-                span = EnumConverter.SkipPast(span, IndexStr);
-            
-                var semiColonIndex = span.IndexOf(";");
-                if (semiColonIndex == -1)
-                {
-                    throw new ArgumentException();
-                }
-
-                if (!int.TryParse(span.Slice(0, semiColonIndex), out var i))
-                {
-                    throw new ArgumentException();
-                }
-
-                span = EnumConverter.SkipPast(span, NameStr);
-
-                var name = span.Slice(0, span.IndexOf('\'')).ToString();
-
-                name = EnumConverter.CleanName(name);
-                
-                sb.AppendLine($"{name} = {i},");
+                sb.AppendLine($"{line.Name} = {line.Index},");
             }
         }
         sb.AppendLine();

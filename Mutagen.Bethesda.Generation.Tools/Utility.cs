@@ -21,4 +21,15 @@ public static class Utility
                 .Build();
         }
     }
+
+    public static ReadOnlySpan<char> SkipPast(ReadOnlySpan<char> str, string target)
+    {
+        var index = str.IndexOf(target);
+        if (index == -1)
+        {
+            throw new ArgumentException();
+        }
+
+        return str.Slice(index + target.Length);
+    }
 }
