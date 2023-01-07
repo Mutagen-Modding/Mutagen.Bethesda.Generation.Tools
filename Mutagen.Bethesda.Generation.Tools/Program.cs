@@ -13,6 +13,7 @@ try
             typeof(RunXEditEnumConverter),
             typeof(RunXEditConditionFunctionGenerator),
             typeof(StringMappingFisher),
+            typeof(ConditionFormLinkTypeFisher),
             typeof(FormLinkTypeFisher),
             typeof(FormLinkInclusionConfirmation))
         .MapResult(
@@ -37,6 +38,11 @@ try
                 return 0;
             },
             async (FormLinkInclusionConfirmation fisher) =>
+            {
+                fisher.Execute();
+                return 0;
+            },
+            async (ConditionFormLinkTypeFisher fisher) =>
             {
                 fisher.Execute();
                 return 0;
