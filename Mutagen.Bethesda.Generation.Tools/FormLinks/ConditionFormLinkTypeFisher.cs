@@ -20,8 +20,8 @@ public class ConditionFormLinkTypeFisher
 
     private class ParametersTypes
     {
-        public readonly HashSet<RecordType> First = new();
-        public readonly HashSet<RecordType> Second = new();
+        public readonly Dictionary<RecordType, int> First = new();
+        public readonly Dictionary<RecordType, int> Second = new();
     }
     
     public void Execute()
@@ -61,11 +61,11 @@ public class ConditionFormLinkTypeFisher
                         stream.MetaData.MasterReferences);
                     if (!link.IsNull && locs.TryGetRecord(link, out var otherRec))
                     {
-                        targetedTypes.GetOrAdd(function).First.Add(otherRec.Record);
+                        targetedTypes.GetOrAdd(function).First.UpdateOrAdd(otherRec.Record, i => i + 1);
                     }
                     if (!link2.IsNull && locs.TryGetRecord(link2, out otherRec))
                     {
-                        targetedTypes.GetOrAdd(function).Second.Add(otherRec.Record);
+                        targetedTypes.GetOrAdd(function).Second.UpdateOrAdd(otherRec.Record, i => i + 1);
                     }
                 }
             }
@@ -78,17 +78,17 @@ public class ConditionFormLinkTypeFisher
             if (function.Value.First.Count != 0)
             {
                 Console.WriteLine($"   First:");
-                foreach (var type in function.Value.First.OrderBy(x => x.Type))
+                foreach (var kv in function.Value.First.OrderBy(x => x.Key.Type))
                 {
-                    Console.WriteLine($"      {type}");
+                    Console.WriteLine($"      {kv.Key}: {kv.Value}");
                 }
             }
             if (function.Value.Second.Count != 0)
             {
                 Console.WriteLine($"   Second:");
-                foreach (var type in function.Value.Second.OrderBy(x => x.Type))
+                foreach (var kv in function.Value.Second.OrderBy(x => x.Key.Type))
                 {
-                    Console.WriteLine($"      {type}");
+                    Console.WriteLine($"      {kv.Key}: {kv.Value}");
                 }
             }
         }
