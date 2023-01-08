@@ -170,6 +170,10 @@ public class RunXEditConditionFunctionGenerator
         switch (paramLine)
         {
             case "ptActor":
+                fieldLine = new XElement(
+                    XName.Get("FormLink", LoquiNs),
+                    new XAttribute("refName", "PlacedNpc"));
+                break;
             case "ptActorBase":
                 fieldLine = new XElement(
                     XName.Get("FormLink", LoquiNs),
