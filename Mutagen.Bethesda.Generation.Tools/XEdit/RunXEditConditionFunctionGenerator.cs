@@ -1,4 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using System.Xml;
 using System.Xml.Linq;
 using CommandLine;
@@ -23,6 +23,9 @@ public class RunXEditConditionFunctionGenerator
     [Option('o', "OutputFolder", Required = true, HelpText = "Where to write out the results")]
     public DirectoryPath OutputFolder { get; set; }
     
+    [Option('r', "ReferenceOutput", Required = false, HelpText = "Old output to reference")]
+    public FilePath ReferencePath { get; set; }
+    
     public async Task Execute()
     {
         Directory.CreateDirectory(OutputFolder);
@@ -38,7 +41,8 @@ public class RunXEditConditionFunctionGenerator
         ConditionFunction[] functions = new ConditionFunctionParser().ReadFunctions(SourceFile).ToArray();
         GenerateParameterType(functions, Path.Combine(OutputFolder, "ParameterType.cs"));
         GenerateGetParameterTypes(functions, Path.Combine(OutputFolder, "GetParameterTypes.cs"));
-        GenerateConditionDefinitions(functions, Path.Combine(OutputFolder, "ConditionFunctionDatas.xml"));
+        var guidMapping = GetGuidMapping(ReferencePath);
+        GenerateConditionDefinitions(functions, Path.Combine(OutputFolder, "ConditionFunctionDatas.xml"), guidMapping);
         GenerateConditionSwitch(functions, Path.Combine(OutputFolder, "ConditionSwitch.cs"));
     }
 
@@ -122,7 +126,7 @@ public class RunXEditConditionFunctionGenerator
         outputStream.Write(sb.ToString());
     }
     
-    public void GenerateConditionDefinitions(IEnumerable<ConditionFunction> source, FilePath output)
+    public void GenerateConditionDefinitions(IEnumerable<ConditionFunction> source, FilePath output, Dictionary<string, Guid>? guidMapping)
     {
         int startId = 10000;
         
@@ -138,12 +142,21 @@ public class RunXEditConditionFunctionGenerator
             {
                 paramElements.Add(elem);
             }
+
+            var className = GetClassName(function);
+
+            var guid = guidMapping?.GetOrDefault(className);
+            if (guid == default)
+            {
+                guid = Guid.NewGuid();
+            }
+            
             objs.Add(
                 new XElement(XName.Get("Object", LoquiNs),
-                    new XAttribute("name", GetClassName(function)),
+                    new XAttribute("name", className),
                     new XAttribute("objType", "Subrecord"),
                     new XAttribute("baseClass", "FunctionConditionData"),
-                    new XAttribute("GUID", Guid.NewGuid()),
+                    new XAttribute("GUID", guid!.Value),
                     new XAttribute("ID", startId++),
                     new XElement(XName.Get("Fields", LoquiNs),
                         paramElements)));
@@ -430,5 +443,14 @@ public class RunXEditConditionFunctionGenerator
 
         using var outputStream = new StreamWriter(File.OpenWrite(output));
         outputStream.Write(sb.ToString());
+    }
+
+    public Dictionary<string, Guid>? GetGuidMapping(FilePath referencePath)
+    {
+        if (!referencePath.Exists) return default;
+        XDocument doc = XDocument.Parse(File.ReadAllText(referencePath));
+        return doc.Elements(XName.Get("Loqui", LoquiNs))
+            .Elements(XName.Get("Object", LoquiNs))
+            .ToDictionary(x => x.GetAttribute("name")!, x => Guid.Parse(x.GetAttribute("GUID")!));
     }
 }
