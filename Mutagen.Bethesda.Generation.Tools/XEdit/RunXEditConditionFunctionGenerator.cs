@@ -1,4 +1,4 @@
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Xml;
 using System.Xml.Linq;
 using CommandLine;
@@ -184,17 +184,17 @@ public class RunXEditConditionFunctionGenerator
         {
             case "ptActor":
                 fieldLine = new XElement(
-                    XName.Get("FormLink", LoquiNs),
+                    XName.Get("FormLinkOrAlias", LoquiNs),
                     new XAttribute("refName", "PlacedNpc"));
                 break;
             case "ptActorBase":
                 fieldLine = new XElement(
-                    XName.Get("FormLink", LoquiNs),
+                    XName.Get("FormLinkOrAlias", LoquiNs),
                     new XAttribute("refName", "Npc"));
                 break;
             case "ptObjectReference":
                 fieldLine = new XElement(
-                    XName.Get("FormLink", LoquiNs),
+                    XName.Get("FormLinkOrAlias", LoquiNs),
                     new XElement(XName.Get("Interface", LoquiNs), "IPlacedSimple"));
                 break;
             case "ptAxis":
@@ -204,7 +204,7 @@ public class RunXEditConditionFunctionGenerator
                 break;
             case "ptActorValue" when category is GameCategory.Fallout4:
                 fieldLine = new XElement(
-                    XName.Get("FormLink", LoquiNs),
+                    XName.Get("FormLinkOrAlias", LoquiNs),
                     new XAttribute("refName", "ActorValueRecord"));
                 break;
             case "ptActorValue":
@@ -214,32 +214,32 @@ public class RunXEditConditionFunctionGenerator
                 break;
             case "ptInventoryObject":
                 fieldLine = new XElement(
-                    XName.Get("FormLink", LoquiNs),
+                    XName.Get("FormLinkOrAlias", LoquiNs),
                     new XElement(XName.Get("Interface", LoquiNs), "IItem"));
                 break;
             case "ptQuest":
                 fieldLine = new XElement(
-                    XName.Get("FormLink", LoquiNs),
+                    XName.Get("FormLinkOrAlias", LoquiNs),
                     new XAttribute("refName", "Quest"));
                 break;
             case "ptFaction":
                 fieldLine = new XElement(
-                    XName.Get("FormLink", LoquiNs),
+                    XName.Get("FormLinkOrAlias", LoquiNs),
                     new XAttribute("refName", "Faction"));
                 break;
             case "ptCell":
                 fieldLine = new XElement(
-                    XName.Get("FormLink", LoquiNs),
+                    XName.Get("FormLinkOrAlias", LoquiNs),
                     new XAttribute("refName", "Cell"));
                 break;
             case "ptClass":
                 fieldLine = new XElement(
-                    XName.Get("FormLink", LoquiNs),
+                    XName.Get("FormLinkOrAlias", LoquiNs),
                     new XAttribute("refName", "Class"));
                 break;
             case "ptRace":
                 fieldLine = new XElement(
-                    XName.Get("FormLink", LoquiNs),
+                    XName.Get("FormLinkOrAlias", LoquiNs),
                     new XAttribute("refName", "Race"));
                 break;
             case "ptSex":
@@ -249,91 +249,91 @@ public class RunXEditConditionFunctionGenerator
                 break;
             case "ptReferencableObject":
                 fieldLine = new XElement(
-                    XName.Get("FormLink", LoquiNs),
+                    XName.Get("FormLinkOrAlias", LoquiNs),
                     new XElement(XName.Get("Interface", LoquiNs), "IPlaceableObject"));
                 break;
             case "ptGlobal":
                 fieldLine = new XElement(
-                    XName.Get("FormLink", LoquiNs),
+                    XName.Get("FormLinkOrAlias", LoquiNs),
                     new XAttribute("refName", "Global"));
                 break;
                 fieldLine = new XElement(
-                    XName.Get("FormLink", LoquiNs),
+                    XName.Get("FormLinkOrAlias", LoquiNs),
                     new XAttribute("refName", "Npc"));
                 break;
             case "ptRegion":
                 fieldLine = new XElement(
-                    XName.Get("FormLink", LoquiNs),
+                    XName.Get("FormLinkOrAlias", LoquiNs),
                     new XAttribute("refName", "Region"));
                 break;
             case "ptWeather":
                 fieldLine = new XElement(
-                    XName.Get("FormLink", LoquiNs),
+                    XName.Get("FormLinkOrAlias", LoquiNs),
                     new XAttribute("refName", "Weather"));
                 break;
             case "ptPackage":
                 fieldLine = new XElement(
-                    XName.Get("FormLink", LoquiNs),
+                    XName.Get("FormLinkOrAlias", LoquiNs),
                     new XAttribute("refName", "Package"));
                 break;
             case "ptFurniture":
                 fieldLine = new XElement(
-                    XName.Get("FormLink", LoquiNs),
+                    XName.Get("FormLinkOrAlias", LoquiNs),
                     new XAttribute("refName", "Furniture"));
                 break;
             case "ptMagicEffect":
                 fieldLine = new XElement(
-                    XName.Get("FormLink", LoquiNs),
+                    XName.Get("FormLinkOrAlias", LoquiNs),
                     new XAttribute("refName", "MagicEffect"));
                 break;
             case "ptMagicItem":
                 fieldLine = new XElement(
-                    XName.Get("FormLink", LoquiNs),
+                    XName.Get("FormLinkOrAlias", LoquiNs),
                     new XAttribute("refName", "Spell"));
                 break;
             case "ptScene":
                 fieldLine = new XElement(
-                    XName.Get("FormLink", LoquiNs),
+                    XName.Get("FormLinkOrAlias", LoquiNs),
                     new XAttribute("refName", "Scene"));
                 break;
             case "ptLocation":
                 fieldLine = new XElement(
-                    XName.Get("FormLink", LoquiNs),
+                    XName.Get("FormLinkOrAlias", LoquiNs),
                     new XAttribute("refName", "Location"));
                 break;
             case "ptFormList":
                 fieldLine = new XElement(
-                    XName.Get("FormLink", LoquiNs),
+                    XName.Get("FormLinkOrAlias", LoquiNs),
                     new XAttribute("refName", "FormList"));
                 break;
             case "ptOwner":
                 fieldLine = new XElement(
-                    XName.Get("FormLink", LoquiNs),
+                    XName.Get("FormLinkOrAlias", LoquiNs),
                     new XElement(XName.Get("Interface", LoquiNs), "IOwner"));
                 break;
             case "ptWorldSpace":
                 fieldLine = new XElement(
-                    XName.Get("FormLink", LoquiNs),
+                    XName.Get("FormLinkOrAlias", LoquiNs),
                     new XAttribute("refName", "Worldspace"));
                 break;
             case "ptKeyword":
                 fieldLine = new XElement(
-                    XName.Get("FormLink", LoquiNs),
+                    XName.Get("FormLinkOrAlias", LoquiNs),
                     new XAttribute("refName", "Keyword"));
                 break;
             case "ptShout":
                 fieldLine = new XElement(
-                    XName.Get("FormLink", LoquiNs),
+                    XName.Get("FormLinkOrAlias", LoquiNs),
                     new XAttribute("refName", "Shout"));
                 break;
             case "ptVoiceType":
                 fieldLine = new XElement(
-                    XName.Get("FormLink", LoquiNs),
+                    XName.Get("FormLinkOrAlias", LoquiNs),
                     new XAttribute("refName", "VoiceType"));
                 break;
             case "ptEncounterZone":
                 fieldLine = new XElement(
-                    XName.Get("FormLink", LoquiNs),
+                    XName.Get("FormLinkOrAlias", LoquiNs),
                     new XAttribute("refName", "EncounterZone"));
                 break;
             case "ptVariableName":
@@ -341,12 +341,12 @@ public class RunXEditConditionFunctionGenerator
                 break;
             case "ptPerk":
                 fieldLine = new XElement(
-                    XName.Get("FormLink", LoquiNs),
+                    XName.Get("FormLinkOrAlias", LoquiNs),
                     new XAttribute("refName", "Perk"));
                 break;
             case "ptIdleForm":
                 fieldLine = new XElement(
-                    XName.Get("FormLink", LoquiNs),
+                    XName.Get("FormLinkOrAlias", LoquiNs),
                     new XAttribute("refName", "IdleAnimation"));
                 break;
             case "ptEquipType":
@@ -356,22 +356,22 @@ public class RunXEditConditionFunctionGenerator
                 break;
             case "ptKnowable":
                 fieldLine = new XElement(
-                    XName.Get("FormLink", LoquiNs),
+                    XName.Get("FormLinkOrAlias", LoquiNs),
                     new XElement(XName.Get("Interface", LoquiNs), "IKnowable"));
                 break;
             case "ptAssociationType":
                 fieldLine = new XElement(
-                    XName.Get("FormLink", LoquiNs),
+                    XName.Get("FormLinkOrAlias", LoquiNs),
                     new XAttribute("refName", "AssociationType"));
                 break;
             case "ptRefType":
                 fieldLine = new XElement(
-                    XName.Get("FormLink", LoquiNs),
+                    XName.Get("FormLinkOrAlias", LoquiNs),
                     new XAttribute("refName", "LocationReferenceType"));
                 break;
             case "ptEventData":
                 fieldLine = new XElement(
-                    XName.Get("FormLink", LoquiNs),
+                    XName.Get("FormLinkOrAlias", LoquiNs),
                     new XElement(XName.Get("Interface", LoquiNs), "IEventDataTarget"));
                 break;
             case "ptInteger":
