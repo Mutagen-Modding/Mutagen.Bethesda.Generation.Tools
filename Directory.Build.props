@@ -1,4 +1,9 @@
 <Project>
+
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+  
   <!-- To be redefined by GitInfo after restore. -->
   <Target Name="GitVersion" />
 

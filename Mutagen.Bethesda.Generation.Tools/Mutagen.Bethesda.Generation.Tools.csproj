@@ -8,12 +8,12 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="CommandLineParser" Version="2.9.1" />
-		<PackageReference Include="Loqui.Generation" Version="2.54.0" />
-		<PackageReference Include="Mutagen.Bethesda.Json" Version="0.40.0" />
-		<PackageReference Include="Noggog.Autofac" Version="2.54.0" />
-		<PackageReference Include="Noggog.CSharpExt" Version="2.54.0" />
-		<PackageReference Include="Mutagen.Bethesda" Version="0.40.0" />
+		<PackageReference Include="CommandLineParser" />
+		<PackageReference Include="Loqui.Generation" />
+		<PackageReference Include="Mutagen.Bethesda.Json" />
+		<PackageReference Include="Noggog.Autofac" />
+		<PackageReference Include="Noggog.CSharpExt" />
+		<PackageReference Include="Mutagen.Bethesda" />
 	</ItemGroup>
 
 	<ItemGroup>
