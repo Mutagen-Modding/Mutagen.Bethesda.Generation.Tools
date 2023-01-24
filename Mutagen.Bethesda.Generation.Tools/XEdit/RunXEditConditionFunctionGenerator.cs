@@ -44,6 +44,7 @@ public class RunXEditConditionFunctionGenerator
         var guidMapping = GetGuidMapping(ReferencePath);
         GenerateConditionDefinitions(functions, Path.Combine(OutputFolder, "ConditionFunctionDatas.xml"), guidMapping);
         GenerateConditionSwitch(functions, Path.Combine(OutputFolder, "ConditionSwitch.cs"));
+        GenerateConditionCustomCode(functions, Path.Combine(OutputFolder, "ConditionClasses"));
     }
 
     public static void GenerateParameterType(IEnumerable<ConditionFunction> source, FilePath output)
@@ -136,11 +137,53 @@ public class RunXEditConditionFunctionGenerator
             var paramElements = new List<XElement>();
             if (ConvertParamToXElement(function.Param1, "FirstParameter", GameCategory, out var elem))
             {
-                paramElements.Add(elem);
+                if (IsStringParam(function.Param1))
+                {
+                    paramElements.Add(
+                        new XElement(
+                            XName.Get("Int32", LoquiNs),
+                            new XAttribute("name", "FirstUnusedIntParameter")));
+                    paramElements.Add(elem);
+                }
+                else
+                {
+                    paramElements.Add(elem);
+                    paramElements.Add(
+                        new XElement(
+                            XName.Get("String", LoquiNs),
+                            new XAttribute("name", "FirstUnusedStringParameter"),
+                            new XAttribute("nullable", "true"),
+                            new XAttribute("binary", "NoGeneration")));
+                }
+            }
+            else
+            {
+                throw new NotImplementedException();
             }
             if (ConvertParamToXElement(function.Param2, "SecondParameter", GameCategory, out elem))
             {
-                paramElements.Add(elem);
+                if (IsStringParam(function.Param2))
+                {
+                    paramElements.Add(
+                        new XElement(
+                            XName.Get("Int32", LoquiNs),
+                            new XAttribute("name", "SecondUnusedIntParameter")));
+                    paramElements.Add(elem);
+                }
+                else
+                {
+                    paramElements.Add(elem);
+                    paramElements.Add(
+                        new XElement(
+                            XName.Get("String", LoquiNs),
+                            new XAttribute("name", "SecondUnusedStringParameter"),
+                            new XAttribute("nullable", "true"),
+                            new XAttribute("binary", "NoGeneration")));
+                }
+            }
+            else
+            {
+                throw new NotImplementedException();
             }
 
             var className = GetClassName(function);
@@ -172,6 +215,11 @@ public class RunXEditConditionFunctionGenerator
             Indent = true
         });
         xml.WriteTo(writer);
+    }
+
+    private bool IsStringParam(string? paramStr)
+    {
+        return paramStr == "ptVariableName";
     }
 
     private bool ConvertParamToXElement(
@@ -257,10 +305,6 @@ public class RunXEditConditionFunctionGenerator
                     XName.Get("FormLinkOrAlias", LoquiNs),
                     new XAttribute("refName", "Global"));
                 break;
-                fieldLine = new XElement(
-                    XName.Get("FormLinkOrAlias", LoquiNs),
-                    new XAttribute("refName", "Npc"));
-                break;
             case "ptRegion":
                 fieldLine = new XElement(
                     XName.Get("FormLinkOrAlias", LoquiNs),
@@ -337,7 +381,10 @@ public class RunXEditConditionFunctionGenerator
                     new XAttribute("refName", "EncounterZone"));
                 break;
             case "ptVariableName":
-                fieldLine = new XElement(XName.Get("String", LoquiNs));
+                fieldLine = new XElement(
+                    XName.Get("String", LoquiNs),
+                    new XAttribute("nullable", "true"),
+                    new XAttribute("binary", "NoGeneration"));
                 break;
             case "ptPerk":
                 fieldLine = new XElement(
@@ -443,6 +490,75 @@ public class RunXEditConditionFunctionGenerator
 
         using var outputStream = new StreamWriter(File.OpenWrite(output));
         outputStream.Write(sb.ToString());
+    }
+
+    public void GenerateConditionCustomCode(IEnumerable<ConditionFunction> source, DirectoryPath output)
+    {
+        if (output.Exists)
+        {
+            output.DeleteEntireFolder();
+        }
+        Directory.CreateDirectory(output);
+
+        foreach (var item in source)
+        {
+            StructuredStringBuilder sb = new();
+            var firstStr = IsStringParam(item.Param1) ? "FirstParameter" : "FirstUnusedStringParameter";
+            var secondStr = IsStringParam(item.Param2) ? "SecondParameter" : "SecondUnusedStringParameter";
+
+            var name = $"{item.Name}ConditionData";
+            
+            using (sb.Namespace($"Mutagen.Bethesda.{GameCategory}"))
+            {
+                using (var c = sb.Class(name))
+                {
+                    c.Partial = true;
+                    c.Interfaces.Add("IConditionStringParameter");
+                }
+                using (sb.CurlyBrace())
+                {
+                    sb.AppendLine($"string? IConditionStringParameterGetter.FirstStringParameter => {firstStr};");
+                    sb.AppendLine();
+
+                    sb.AppendLine($"string? IConditionStringParameterGetter.SecondStringParameter => {secondStr};");
+                    sb.AppendLine();
+                    
+                    sb.AppendLine("string? IConditionStringParameter.FirstStringParameter");
+                    using (sb.CurlyBrace())
+                    {
+                        sb.AppendLine($"get => {firstStr};");
+                        sb.AppendLine($"set => {firstStr} = value;");
+                    }
+                    sb.AppendLine();
+                    
+                    sb.AppendLine("string? IConditionStringParameter.SecondStringParameter");
+                    using (sb.CurlyBrace())
+                    {
+                        sb.AppendLine($"get => {secondStr};");
+                        sb.AppendLine($"set => {secondStr} = value;");
+                    }
+                    sb.AppendLine();
+                }
+                sb.AppendLine();
+                
+                using (var c = sb.Class($"{name}BinaryOverlay"))
+                {
+                    c.Partial = true;
+                    c.AccessModifier = AccessModifier.Internal;
+                }
+                using (sb.CurlyBrace())
+                {
+                    sb.AppendLine($"public string? {firstStr} => ParameterOneString;");
+                    sb.AppendLine();
+
+                    sb.AppendLine($"public string? {secondStr} => ParameterTwoString;");
+                    sb.AppendLine();
+                }
+                sb.AppendLine();
+            }
+
+            File.WriteAllText(Path.Combine(output, $"{name}.cs"), sb.ToString());
+        }
     }
 
     public Dictionary<string, Guid>? GetGuidMapping(FilePath referencePath)
