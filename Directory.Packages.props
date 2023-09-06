@@ -1,27 +1,47 @@
 <Project>
   <ItemGroup>
     <PackageVersion Include="CommandLineParser" Version="2.9.1" />
-    <PackageVersion Include="Loqui.Generation" Version="2.54.0" />
-    <PackageVersion Include="Mutagen.Bethesda.Json" Version="0.40.0" />
-    <PackageVersion Include="Noggog.Autofac" Version="2.54.0" />
-    <PackageVersion Include="Noggog.CSharpExt" Version="2.54.0" />
-    <PackageVersion Include="Mutagen.Bethesda" Version="0.40.0" />
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.4.1" />
-    <PackageVersion Include="Noggog.Testing" Version="2.54.0" />
-    <PackageVersion Include="xunit" Version="2.4.2" />
-    <PackageVersion Include="xunit.runner.console" Version="2.4.2">
+    <PackageVersion Include="Loqui.Generation">
+      <Version>2.60.0</Version>
+    </PackageVersion>
+    <PackageVersion Include="Mutagen.Bethesda.Json">
+      <Version>0.42.0.1-zdev</Version>
+    </PackageVersion>
+    <PackageVersion Include="Noggog.Autofac">
+      <Version>2.60.0.1-nightly-20230901-092788</Version>
+    </PackageVersion>
+    <PackageVersion Include="Noggog.CSharpExt">
+      <Version>2.60.0.1-nightly-20230901-092788</Version>
+    </PackageVersion>
+    <PackageVersion Include="Mutagen.Bethesda">
+      <Version>0.42.0.1-zdev</Version>
+    </PackageVersion>
+    <PackageVersion Include="Microsoft.NET.Test.Sdk">
+      <Version>17.7.2</Version>
+    </PackageVersion>
+    <PackageVersion Include="Noggog.Testing">
+      <Version>2.60.0.1-nightly-20230901-092788</Version>
+    </PackageVersion>
+    <PackageVersion Include="xunit">
+      <Version>2.5.0</Version>
+    </PackageVersion>
+    <PackageVersion Include="xunit.runner.console">
+      <Version>2.5.0</Version>
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageVersion>
-    <PackageVersion Include="xunit.runner.visualstudio" Version="2.4.5">
+    <PackageVersion Include="xunit.runner.visualstudio">
+      <Version>2.5.0</Version>
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageVersion>
-    <PackageVersion Include="GitInfo" Version="2.3.0">
+    <PackageVersion Include="GitInfo">
+      <Version>3.3.3</Version>
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageVersion>
-    <PackageVersion Include="NuGetizer" Version="0.9.1">
+    <PackageVersion Include="NuGetizer">
+      <Version>1.1.1</Version>
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageVersion>

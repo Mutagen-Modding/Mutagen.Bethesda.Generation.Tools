@@ -1,4 +1,5 @@
 ﻿using CommandLine;
+using Mutagen.Bethesda.Generation.Tools.ContentAnalyzers;
 using Mutagen.Bethesda.Generation.Tools.FormLinks;
 using Mutagen.Bethesda.Generation.Tools.FormLinks.InclusionConfirmation;
 using Mutagen.Bethesda.Generation.Tools.Strings;
@@ -15,36 +16,48 @@ try
             typeof(StringMappingFisher),
             typeof(ConditionFormLinkTypeFisher),
             typeof(FormLinkTypeFisher),
-            typeof(FormLinkInclusionConfirmation))
+            typeof(FormLinkInclusionConfirmation),
+            typeof(DumpSubrecords),
+            typeof(AnalyzeSubrecordContent))
         .MapResult(
-            async (RunXEditEnumConverter xEditEnum) =>
+            async (RunXEditEnumConverter x) =>
             {
-                await xEditEnum.Execute();
+                await x.Execute();
                 return 0;
             },
-            async (RunXEditConditionFunctionGenerator xEditEnum) =>
+            async (RunXEditConditionFunctionGenerator x) =>
             {
-                await xEditEnum.Execute();
+                await x.Execute();
                 return 0;
             },
-            async (StringMappingFisher fisher) =>
+            async (StringMappingFisher x) =>
             {
-                fisher.Execute();
+                x.Execute();
                 return 0;
             },
-            async (FormLinkTypeFisher fisher) =>
+            async (FormLinkTypeFisher x) =>
             {
-                fisher.Execute();
+                x.Execute();
                 return 0;
             },
-            async (FormLinkInclusionConfirmation fisher) =>
+            async (FormLinkInclusionConfirmation x) =>
             {
-                fisher.Execute();
+                x.Execute();
                 return 0;
             },
-            async (ConditionFormLinkTypeFisher fisher) =>
+            async (ConditionFormLinkTypeFisher x) =>
             {
-                fisher.Execute();
+                x.Execute();
+                return 0;
+            },
+            async (DumpSubrecords x) =>
+            {
+                x.Execute();
+                return 0;
+            },
+            async (AnalyzeSubrecordContent x) =>
+            {
+                x.Execute();
                 return 0;
             },
             async _ =>
