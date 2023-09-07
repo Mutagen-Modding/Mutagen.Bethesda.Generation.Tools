@@ -1,4 +1,4 @@
-using System.Text;
+﻿using System.Text;
 using CommandLine;
 using Mutagen.Bethesda.Generation.Tools.FormLinks;
 using Mutagen.Bethesda.Generation.Tools.Strings;
@@ -32,6 +32,7 @@ public class DumpSubrecords
     {
         public int RecordCount;
         public Dictionary<int, int> LengthCount = new();
+        public List<ReadOnlyMemorySlice<byte>> Datas = new();
     }
     
     private class OffsetCounter
@@ -96,6 +97,7 @@ public class DumpSubrecords
                         lengthCount = 0;
                     }
                     subRecItem.LengthCount[subRec.ContentLength] = lengthCount + 1;
+                    subRecItem.Datas.Add(subRec.Content);
                     
                     sb.Append($" {subRec.RecordType}");
 
@@ -180,6 +182,8 @@ public class DumpSubrecords
                 var linkTracker = offsetTracker.LinkCount.GetOrAdd(otherRec.Record);
                 offsetTracker.LinkCount[otherRec.Record] = linkTracker + 1;
             }
+
+            content = content.Slice(2);
         }
     }
 }
