@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using CommandLine;
+using Mutagen.Bethesda.Generation.Tools.FormLinks;
 using Mutagen.Bethesda.Generation.Tools.Strings;
 using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Plugins.Analysis;
@@ -155,6 +156,10 @@ public class DumpSubrecords
     {
         var content = subRec.Content;
         if (content.Length < 4) return;
+        if (FormLinkTypeFisher.IsLikelyNullTerminatedString(content))
+        {
+            return;
+        }
         var times = (content.Length - 4) / 2 + 1;
         for (int i = 0; i < times; i++)
         {
