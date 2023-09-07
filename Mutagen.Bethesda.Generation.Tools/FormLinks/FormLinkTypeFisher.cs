@@ -1,10 +1,8 @@
 using CommandLine;
-using Mutagen.Bethesda.Environments;
 using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Plugins.Analysis;
 using Mutagen.Bethesda.Plugins.Binary.Streams;
 using Mutagen.Bethesda.Plugins.Binary.Translations;
-using Mutagen.Bethesda.Skyrim;
 using Noggog;
 
 namespace Mutagen.Bethesda.Generation.Tools.FormLinks;
@@ -35,7 +33,12 @@ public class FormLinkTypeFisher
     [Option('p', "RepeatEvery", Required = false, HelpText = "How often to repeat the check based on length")]
     public ushort? RepeatEvery { get; set; }
 
-    class Counter
+    public class FormLinkFisherDictionary
+    {
+        public readonly Dictionary<RecordType, Results> ByLinkedRecordType = new();
+    }
+    
+    public class Results
     {
         public int Count;
     }
@@ -47,7 +50,8 @@ public class FormLinkTypeFisher
             .OnlyEnabledAndExisting()
             .Select(x => new ModPath(Path.Combine(env.DataFolderPath, x.ModKey.FileName)))
             .ToList();
-        var targetedTypes = new Dictionary<RecordType, Counter>();
+        var targetedTypes = new FormLinkFisherDictionary();
+        bool isLikelyString = true;
         foreach (var modPath in modsToCheck)
         {
             Console.WriteLine($"Checking {modPath}");
@@ -77,9 +81,9 @@ public class FormLinkTypeFisher
                             stream.MetaData.MasterReferences);
                         if (!link.IsNull && locs.TryGetRecord(link, out var otherRec))
                         {
-                            var cur = targetedTypes.GetOrAdd(otherRec.Record);
+                            var cur = targetedTypes.ByLinkedRecordType.GetOrAdd(otherRec.Record);
                             cur.Count++;
-                            targetedTypes[otherRec.Record] = cur;
+                            targetedTypes.ByLinkedRecordType[otherRec.Record] = cur;
                         }
 
                         if (RepeatEvery != null)
@@ -87,15 +91,32 @@ public class FormLinkTypeFisher
                             content.Slice(RepeatEvery.Value);
                         }
                     }
+
+                    if (isLikelyString && !IsLikelyNullTerminatedString(subRec.Content))
+                    {
+                        isLikelyString = false;
+                    }
                 }
             }
         }
 
         Console.WriteLine($"{MajorRecordType} -> {SubRecordType} {(Offset == 0 ? null : $"at offset {Offset} ")}targeted:");
-        foreach (var type in targetedTypes.OrderBy(x => x.Key.Type))
+        PrintResults(targetedTypes);
+        Console.WriteLine("Done");
+    }
+
+    public static void PrintResults(FormLinkFisherDictionary targetedTypes)
+    {
+        foreach (var type in targetedTypes.ByLinkedRecordType.OrderBy(x => x.Key.Type))
         {
             Console.WriteLine($"  {type.Key}: {type.Value.Count}");
         }
-        Console.WriteLine("Done");
+    }
+
+    public static bool IsLikelyNullTerminatedString(ReadOnlyMemorySlice<byte> bytes)
+    {
+        if (bytes.Length == 0) return false;
+        if (bytes[^1] != 0) return false;
+        return bytes.SliceUpTo(bytes.Length - 1).All(x => char.IsAscii((char)x));
     }
 }
