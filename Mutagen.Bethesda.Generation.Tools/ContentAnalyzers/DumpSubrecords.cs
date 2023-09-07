@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using CommandLine;
 using Mutagen.Bethesda.Generation.Tools.FormLinks;
 using Mutagen.Bethesda.Generation.Tools.Strings;
@@ -122,9 +122,16 @@ public class DumpSubrecords
         foreach (var entry in subrecordCounter.OrderBy(x => x.Key.Type))
         {
             Console.WriteLine($"  {entry.Key}: {entry.Value.RecordCount}");
-            foreach (var lenEntry in entry.Value.LengthCount)
+            if (entry.Value.Datas.All(FormLinkTypeFisher.IsLikelyNullTerminatedString))
             {
-                Console.WriteLine($"    Len {lenEntry.Key}: {lenEntry.Value}");
+                Console.WriteLine($"    Likely string");
+            }
+            else
+            {
+                foreach (var lenEntry in entry.Value.LengthCount)
+                {
+                    Console.WriteLine($"    Len {lenEntry.Key}: {lenEntry.Value}");
+                }
             }
         }
         
