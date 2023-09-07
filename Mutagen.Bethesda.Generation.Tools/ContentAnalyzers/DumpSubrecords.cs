@@ -2,7 +2,10 @@
 using CommandLine;
 using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Plugins.Analysis;
+using Mutagen.Bethesda.Plugins.Binary.Headers;
 using Mutagen.Bethesda.Plugins.Binary.Streams;
+using Mutagen.Bethesda.Plugins.Binary.Translations;
+using Mutagen.Bethesda.Plugins.Masters;
 using Noggog;
 
 namespace Mutagen.Bethesda.Generation.Tools.ContentAnalyzers;
@@ -22,10 +25,22 @@ public class DumpSubrecords
     [Option('m', "Major", Required = true, HelpText = "MajorRecord RecordType to search under")]
     public string MajorRecordType { get; set; } = RecordType.Null.Type;
 
-    private class Counter
+    private class LengthCounter
     {
         public int RecordCount;
         public Dictionary<int, int> LengthCount = new();
+    }
+    
+    private class OffsetCounter
+    {
+        public Dictionary<RecordType, int> LinkCount = new();
+        public int Count;
+    }
+    
+    private class LinkCounter
+    {
+        public RecordType Type;
+        public int Count;
     }
 
     public void Execute()
@@ -35,8 +50,9 @@ public class DumpSubrecords
             .OnlyEnabledAndExisting()
             .Select(x => new ModPath(Path.Combine(env.DataFolderPath, x.ModKey.FileName)))
             .ToList();
-        var subrecordCounter = new Dictionary<RecordType, Counter>();
+        var subrecordCounter = new Dictionary<RecordType, LengthCounter>();
         var printedStrings = new HashSet<string>();
+        var formLinkFishing = new Dictionary<RecordType, Dictionary<int, OffsetCounter>>();
         foreach (var modPath in modsToCheck)
         {
             Console.WriteLine($"Checking {modPath}");
@@ -71,6 +87,8 @@ public class DumpSubrecords
                     subRecItem.LengthCount[subRec.ContentLength] = lengthCount + 1;
                     
                     sb.Append($" {subRec.RecordType}");
+
+                    FishForFormLinks(locs, stream.MetaData.MasterReferences, subRec, formLinkFishing);
                 }
 
                 var str = sb.ToString();
@@ -96,6 +114,44 @@ public class DumpSubrecords
                 Console.WriteLine($"    Len {lenEntry.Key}: {lenEntry.Value}");
             }
         }
+        
+        Console.WriteLine($"Writing potential formlink counts for {MajorRecordType}:");
+        foreach (var entry in formLinkFishing.OrderBy(x => x.Key.Type))
+        {
+            Console.WriteLine($"  {entry.Key}:");
+            foreach (var offsetEntry in entry.Value)
+            {
+                Console.WriteLine($"    Offset {offsetEntry.Key}:");
+                foreach (var linkEntry in offsetEntry.Value.LinkCount)
+                {
+                    Console.WriteLine($"      {linkEntry.Key}: {linkEntry.Value} times");
+                }
+            }
+        }
         Console.WriteLine("Done");
+    }
+
+    private void FishForFormLinks(
+        RecordLocatorResults locs,
+        IMasterReferenceCollection masters,
+        SubrecordPinFrame subRec,
+        Dictionary<RecordType, Dictionary<int, OffsetCounter>> tracker)
+    {
+        var content = subRec.Content;
+        if (content.Length < 4) return;
+        var times = (content.Length - 4) / 2 + 1;
+        for (int i = 0; i < times; i++)
+        {
+            var link = FormKeyBinaryTranslation.Instance.Parse(
+                content,
+                masters);
+            if (!link.IsNull && locs.TryGetRecord(link, out var otherRec))
+            {
+                var offsetTracker = tracker.GetOrAdd(subRec.RecordType).GetOrAdd(i * 2);
+                offsetTracker.Count++;
+                var linkTracker = offsetTracker.LinkCount.GetOrAdd(otherRec.Record);
+                offsetTracker.LinkCount[otherRec.Record] = linkTracker + 1;
+            }
+        }
     }
 }

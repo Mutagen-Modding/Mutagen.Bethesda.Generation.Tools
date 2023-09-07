@@ -37,7 +37,6 @@ public class FormLinkTypeFisher
 
     class Counter
     {
-        public RecordType Type;
         public int Count;
     }
     
