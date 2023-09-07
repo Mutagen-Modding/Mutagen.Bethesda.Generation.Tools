@@ -1,11 +1,13 @@
 ﻿using System.Text;
 using CommandLine;
+using Mutagen.Bethesda.Generation.Tools.Strings;
 using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Plugins.Analysis;
 using Mutagen.Bethesda.Plugins.Binary.Headers;
 using Mutagen.Bethesda.Plugins.Binary.Streams;
 using Mutagen.Bethesda.Plugins.Binary.Translations;
 using Mutagen.Bethesda.Plugins.Masters;
+using Mutagen.Bethesda.Strings;
 using Noggog;
 
 namespace Mutagen.Bethesda.Generation.Tools.ContentAnalyzers;
@@ -53,6 +55,7 @@ public class DumpSubrecords
         var subrecordCounter = new Dictionary<RecordType, LengthCounter>();
         var printedStrings = new HashSet<string>();
         var formLinkFishing = new Dictionary<RecordType, Dictionary<int, OffsetCounter>>();
+        var stringResults = new Dictionary<StringMappingFisher.TargetSubrecord, Dictionary<StringsSource, Dictionary<uint, int>>>();
         foreach (var modPath in modsToCheck)
         {
             Console.WriteLine($"Checking {modPath}");
@@ -62,6 +65,13 @@ public class DumpSubrecords
                 Release);
             using var stream = new MutagenBinaryReadStream(modPath, Release);
             Console.WriteLine($"Dumping data");
+        
+            var stringsOverlay = StringsFolderLookupOverlay.TypicalFactory(
+                Release,
+                modPath.ModKey,
+                env.DataFolderPath,
+                null);
+            
             foreach (var recordLocationMarker in locs.ListedRecords)
             {
                 if (recordLocationMarker.Value.Record != MajorRecordType) continue;
@@ -89,6 +99,8 @@ public class DumpSubrecords
                     sb.Append($" {subRec.RecordType}");
 
                     FishForFormLinks(locs, stream.MetaData.MasterReferences, subRec, formLinkFishing);
+
+                    StringMappingFisher.CheckSubrecordIsString(majorFrame.RecordType, stringResults, subRec, stringsOverlay);
                 }
 
                 var str = sb.ToString();
@@ -128,6 +140,10 @@ public class DumpSubrecords
                 }
             }
         }
+        
+        Console.WriteLine($"Writing potential string counts for {MajorRecordType}:");
+        StringMappingFisher.PrintResults(stringResults);
+        
         Console.WriteLine("Done");
     }
 

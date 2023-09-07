@@ -2,6 +2,7 @@ using CommandLine;
 using Mutagen.Bethesda.Environments;
 using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Plugins.Analysis;
+using Mutagen.Bethesda.Plugins.Binary.Headers;
 using Mutagen.Bethesda.Plugins.Binary.Streams;
 using Mutagen.Bethesda.Plugins.Records;
 using Mutagen.Bethesda.Plugins.Utility;
@@ -22,7 +23,7 @@ public class StringMappingFisher
     [Option('m', "Major", Required = false, HelpText = "MajorRecord RecordType to search under")]
     public string? MajorRecordType { get; set; }
 
-    record TargetSubrecord(RecordType Major, RecordType SubRecord);
+    public record TargetSubrecord(RecordType Major, RecordType SubRecord);
 
     public void Execute()
     {
@@ -79,7 +80,7 @@ public class StringMappingFisher
         return true;
     }
 
-    private static void FillResults(
+    public static void FillResults(
         GameRelease release,
         string? majorRecordType,
         ModPath modPath,
@@ -112,24 +113,33 @@ public class StringMappingFisher
             }
             foreach (var subRec in majorFrame.EnumerateSubrecords())
             {
-                if (subRec.ContentLength != 4) continue;
-                var key = subRec.AsUInt32();
-                if (key == 0) continue;
-
-                foreach (var source in Enums<StringsSource>.Values)
-                {
-                    if (stringsOverlay.TryLookup(source, Language.English, key, out _))
-                    {
-                        results.GetOrAdd(new(majorFrame.RecordType, subRec.RecordType))
-                            .GetOrAdd(source)
-                            .UpdateOrAdd(key, (existing) => existing + 1);
-                    }
-                }
+                CheckSubrecordIsString(majorFrame.RecordType, results, subRec, stringsOverlay);
             }
         }
     }
 
-    private static void PrintResults(Dictionary<TargetSubrecord, Dictionary<StringsSource, Dictionary<uint, int>>> results)
+    public static void CheckSubrecordIsString(
+        RecordType majorRecType,
+        Dictionary<TargetSubrecord, Dictionary<StringsSource, Dictionary<uint, int>>> results, 
+        SubrecordPinFrame subRec,
+        StringsFolderLookupOverlay stringsOverlay)
+    {
+        if (subRec.ContentLength != 4) return;
+        var key = subRec.AsUInt32();
+        if (key == 0) return;
+
+        foreach (var source in Enums<StringsSource>.Values)
+        {
+            if (stringsOverlay.TryLookup(source, Language.English, key, out _))
+            {
+                results.GetOrAdd(new(majorRecType, subRec.RecordType))
+                    .GetOrAdd(source)
+                    .UpdateOrAdd(key, (existing) => existing + 1);
+            }
+        }
+    }
+
+    public static void PrintResults(Dictionary<TargetSubrecord, Dictionary<StringsSource, Dictionary<uint, int>>> results)
     {
         foreach (var rec in results.GroupBy(x => x.Key.Major))
         {
