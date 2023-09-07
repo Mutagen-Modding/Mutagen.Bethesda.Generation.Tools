@@ -1,4 +1,4 @@
-using CommandLine;
+﻿using CommandLine;
 using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Plugins.Analysis;
 using Mutagen.Bethesda.Plugins.Binary.Streams;
@@ -21,8 +21,8 @@ public class AnalyzeSubrecordContent
     [Option('r', "Release", Required = true, HelpText = "GameRelease targeted")]
     public GameRelease Release { get; set; }
 
-    [Option('m', "Major", Required = true, HelpText = "MajorRecord RecordType to search under")]
-    public string MajorRecordType { get; set; } = RecordType.Null.Type;
+    [Option('m', "Major", HelpText = "MajorRecord RecordType to search under")]
+    public string? MajorRecordType { get; set; }
 
     [Option('s', "Sub", Required = true,  HelpText = "SubRecord RecordType to analyze")]
     public string SubRecordType { get; set; } = RecordType.Null.Type;
@@ -47,7 +47,7 @@ public class AnalyzeSubrecordContent
             List<ReadOnlyMemorySlice<byte>> recs = new();
             foreach (var recordLocationMarker in locs.ListedRecords)
             {
-                if (recordLocationMarker.Value.Record != MajorRecordType) continue;
+                if (MajorRecordType != null && recordLocationMarker.Value.Record != MajorRecordType) continue;
                 stream.Position = recordLocationMarker.Key;
                 var majorFrame = stream.ReadMajorRecord();
                 if (majorFrame.IsCompressed)
