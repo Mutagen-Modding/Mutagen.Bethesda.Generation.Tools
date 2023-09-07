@@ -1,7 +1,10 @@
-﻿using CommandLine;
+using CommandLine;
 using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Plugins.Analysis;
 using Mutagen.Bethesda.Plugins.Binary.Streams;
+using Mutagen.Bethesda.Plugins.Binary.Translations;
+using Mutagen.Bethesda.Strings;
+using Mutagen.Bethesda.Strings.DI;
 using Noggog;
 
 namespace Mutagen.Bethesda.Generation.Tools.ContentAnalyzers;
@@ -60,11 +63,20 @@ public class AnalyzeSubrecordContent
             
             Console.WriteLine("Raw byte content:");
             foreach (var hexStr in recs
-                         .Select(x => $"0x{x.ToHexString() }")
+                         .Select(x => $"0x{x.ToHexString()}")
                          .Distinct()
                          .OrderBy(x => x.Length))
             {
                 Console.WriteLine($"  {hexStr} ({hexStr.Length - 2})");
+            }
+
+            Console.WriteLine("String content:");
+            foreach (var str in recs
+                         .Select(x => BinaryStringUtility.ProcessWholeToZString(x, MutagenEncodingProvider.Instance.GetEncoding(Release, Language.English)))
+                         .Distinct()
+                         .OrderBy(x => x))
+            {
+                Console.WriteLine($"  {str}");
             }
         }
     }
