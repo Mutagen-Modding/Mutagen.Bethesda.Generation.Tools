@@ -182,6 +182,6 @@ public class StringMappingFisher
 
     private static bool IsHighPotential(KeyValuePair<TargetSubrecord, Dictionary<StringsSource, Dictionary<uint, int>>> x)
     {
-        return x.Value.Count == 1;
+        return x.Value.Count == 1 && x.Value.Values.All(x => x.Values.All(x => x == 1));
     }
 }
