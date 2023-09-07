@@ -25,6 +25,16 @@ public class StringMappingFisher
 
     public record TargetSubrecord(RecordType Major, RecordType SubRecord);
 
+    public class StringsSourceDictionary
+    {
+        public readonly Dictionary<StringsSource, StringIdCounterDictionary> ByStringsSource = new();
+    }
+
+    public class StringIdCounterDictionary
+    {
+        public readonly Dictionary<uint, int> ByStringIdCounter = new();
+    }
+
     public void Execute()
     {
         if (!Release.ToCategory().HasLocalization())
@@ -33,7 +43,7 @@ public class StringMappingFisher
             return;
         }
 
-        var results = new Dictionary<TargetSubrecord, Dictionary<StringsSource, Dictionary<uint, int>>>();
+        var results = new Dictionary<TargetSubrecord, StringsSourceDictionary>();
 
         if (SourceFile == ModPath.Empty)
         {
@@ -85,7 +95,7 @@ public class StringMappingFisher
         string? majorRecordType,
         ModPath modPath,
         DirectoryPath dataPath,
-        Dictionary<TargetSubrecord, Dictionary<StringsSource, Dictionary<uint, int>>> results)
+        Dictionary<TargetSubrecord, StringsSourceDictionary> results)
     {        
         using var stream = new MutagenBinaryReadStream(modPath, release);
         
@@ -120,7 +130,7 @@ public class StringMappingFisher
 
     public static void CheckSubrecordIsString(
         RecordType majorRecType,
-        Dictionary<TargetSubrecord, Dictionary<StringsSource, Dictionary<uint, int>>> results, 
+        Dictionary<TargetSubrecord, StringsSourceDictionary> results, 
         SubrecordPinFrame subRec,
         StringsFolderLookupOverlay stringsOverlay)
     {
@@ -133,13 +143,13 @@ public class StringMappingFisher
             if (stringsOverlay.TryLookup(source, Language.English, key, out _))
             {
                 results.GetOrAdd(new(majorRecType, subRec.RecordType))
-                    .GetOrAdd(source)
-                    .UpdateOrAdd(key, (existing) => existing + 1);
+                    .ByStringsSource.GetOrAdd(source)
+                    .ByStringIdCounter.UpdateOrAdd(key, (existing) => existing + 1);
             }
         }
     }
 
-    public static void PrintResults(Dictionary<TargetSubrecord, Dictionary<StringsSource, Dictionary<uint, int>>> results)
+    public static void PrintResults(Dictionary<TargetSubrecord, StringsSourceDictionary> results)
     {
         foreach (var rec in results.GroupBy(x => x.Key.Major))
         {
@@ -155,7 +165,7 @@ public class StringMappingFisher
             foreach (var subRec in highPotentials)
             {
                 Console.WriteLine(
-                    $"| {subRec.Key.SubRecord} => {string.Join(", ", subRec.Value.Select(x => $"{x.Key}:{x.Value.Count}"))}");
+                    $"| {subRec.Key.SubRecord} => {string.Join(", ", subRec.Value.ByStringsSource.Select(x => $"{x.Key}:{x.Value.ByStringIdCounter.Count}"))}");
             }
 
             if (highPotentials.Length > 0)
@@ -163,15 +173,15 @@ public class StringMappingFisher
                 Console.WriteLine("|");
             }
 
-            var lowLiklihood = rec.Where(x => !IsHighPotential(x)).ToArray();
-            if (lowLiklihood.Length > 0)
+            var lowLikelihood = rec.Where(x => !IsHighPotential(x)).ToArray();
+            if (lowLikelihood.Length > 0)
             {
                 Console.WriteLine(
                     $"| ---- Lower Potentials: ---");
-                foreach (var subRec in lowLiklihood)
+                foreach (var subRec in lowLikelihood)
                 {
                     Console.WriteLine(
-                        $"| {subRec.Key.SubRecord} => {string.Join(", ", subRec.Value.Select(x => $"{x.Key}:{x.Value.Count}"))}");
+                        $"| {subRec.Key.SubRecord} => {string.Join(", ", subRec.Value.ByStringsSource.Select(x => $"{x.Key}:{x.Value.ByStringIdCounter.Count}"))}");
                 }
             }
             
@@ -180,8 +190,10 @@ public class StringMappingFisher
         }
     }
 
-    private static bool IsHighPotential(KeyValuePair<TargetSubrecord, Dictionary<StringsSource, Dictionary<uint, int>>> x)
+    private static bool IsHighPotential(KeyValuePair<TargetSubrecord, StringsSourceDictionary> x)
     {
-        return x.Value.Count == 1 && x.Value.Values.All(x => x.Values.All(x => x == 1));
+        return x.Value.ByStringsSource.Count == 1 
+               && x.Value.ByStringsSource.Values.All(x =>
+                   x.ByStringIdCounter.Values.All(x => x == 1));
     }
 }

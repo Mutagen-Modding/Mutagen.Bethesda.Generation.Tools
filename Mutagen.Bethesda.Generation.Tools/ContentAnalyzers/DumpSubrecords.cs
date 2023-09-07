@@ -55,7 +55,7 @@ public class DumpSubrecords
         var subrecordCounter = new Dictionary<RecordType, LengthCounter>();
         var printedStrings = new HashSet<string>();
         var formLinkFishing = new Dictionary<RecordType, Dictionary<int, OffsetCounter>>();
-        var stringResults = new Dictionary<StringMappingFisher.TargetSubrecord, Dictionary<StringsSource, Dictionary<uint, int>>>();
+        var stringResults = new Dictionary<StringMappingFisher.TargetSubrecord, StringMappingFisher.StringsSourceDictionary>();
         foreach (var modPath in modsToCheck)
         {
             Console.WriteLine($"Checking {modPath}");
