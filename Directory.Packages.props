@@ -5,7 +5,7 @@
       <Version>2.60.0</Version>
     </PackageVersion>
     <PackageVersion Include="Mutagen.Bethesda.Json">
-      <Version>0.42.0.1-zdev</Version>
+      <Version>0.42.0.1-nightly-20230906-100517</Version>
     </PackageVersion>
     <PackageVersion Include="Noggog.Autofac">
       <Version>2.60.0.1-nightly-20230901-092788</Version>
@@ -14,7 +14,7 @@
       <Version>2.60.0.1-nightly-20230901-092788</Version>
     </PackageVersion>
     <PackageVersion Include="Mutagen.Bethesda">
-      <Version>0.42.0.1-zdev</Version>
+      <Version>0.42.0.1-nightly-20230906-100517</Version>
     </PackageVersion>
     <PackageVersion Include="Microsoft.NET.Test.Sdk">
       <Version>17.7.2</Version>

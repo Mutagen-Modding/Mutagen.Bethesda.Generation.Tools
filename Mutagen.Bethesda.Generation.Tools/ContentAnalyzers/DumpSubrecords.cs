@@ -124,7 +124,7 @@ public class DumpSubrecords
         foreach (var entry in subrecordCounter.OrderBy(x => x.Key.Type))
         {
             Console.WriteLine($"  {entry.Key}: {entry.Value.RecordCount}");
-            if (entry.Value.Datas.All(FormLinkTypeFisher.IsLikelyNullTerminatedString))
+            if (FormLinkTypeFisher.IsLikelyNullTerminatedString(entry.Value.Datas))
             {
                 Console.WriteLine($"    Likely string");
             }
@@ -138,10 +138,11 @@ public class DumpSubrecords
         }
         
         Console.WriteLine($"Writing potential formlink counts for {MajorRecordType}:");
-        foreach (var entry in formLinkFishing.OrderBy(x => x.Key.Type))
+        foreach (var entry in formLinkFishing
+                     .OrderBy(x => x.Key.Type))
         {
             Console.WriteLine($"  {entry.Key}:");
-            foreach (var offsetEntry in entry.Value)
+            foreach (var offsetEntry in entry.Value.OrderBy(x => x.Key))
             {
                 Console.WriteLine($"    Offset {offsetEntry.Key}:");
                 foreach (var linkEntry in offsetEntry.Value.LinkCount)
@@ -164,7 +165,7 @@ public class DumpSubrecords
         Dictionary<RecordType, Dictionary<int, OffsetCounter>> tracker)
     {
         var content = subRec.Content;
-        if (content.Length < 4) return;
+        if (content.Length < 4 || content.Length > 200) return;
         if (FormLinkTypeFisher.IsLikelyNullTerminatedString(content))
         {
             return;

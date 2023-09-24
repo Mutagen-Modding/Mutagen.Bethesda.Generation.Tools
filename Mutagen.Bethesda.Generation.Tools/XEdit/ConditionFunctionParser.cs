@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using DynamicData;
 using Mutagen.Bethesda.Generation.Tools.XEdit.Enum;
 using Noggog;
 
@@ -17,7 +18,7 @@ public class ConditionFunctionParser
     {
         foreach (var line in File.ReadLines(source))
         {
-            var span = line.AsSpan();
+            var span = RemoveComments(line).AsSpan();
             span = Utility.SkipPast(span, IndexStr);
             
             var semiColonIndex = span.IndexOf(";");
@@ -42,6 +43,19 @@ public class ConditionFunctionParser
 
             yield return new ConditionFunction(name, i, param1Str, param2Str);
         }
+    }
+
+    public string RemoveComments(string str)
+    {
+        int index = str.IndexOf("{");
+        while (index != -1)
+        {
+            int endIndex = str.IndexOf("}", index);
+            str = str.Substring(0, index) + str.Substring(endIndex + 1);
+            index = str.IndexOf("{");
+        }
+
+        return str;
     }
 
     public bool TryGetParamTypeStr(ReadOnlySpan<char> span, string paramName, [MaybeNullWhen(false)] out string paramType)

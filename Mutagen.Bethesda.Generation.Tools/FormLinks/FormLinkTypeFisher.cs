@@ -119,4 +119,10 @@ public class FormLinkTypeFisher
         if (bytes[^1] != 0) return false;
         return bytes.SliceUpTo(bytes.Length - 1).All(x => char.IsAscii((char)x));
     }
+
+    public static bool IsLikelyNullTerminatedString(IReadOnlyCollection<ReadOnlyMemorySlice<byte>> bytes)
+    {
+        if (!bytes.Select(x => x.Length).Distinct().CountGreaterThan(4)) return false;
+        return bytes.All(IsLikelyNullTerminatedString);
+    }
 }

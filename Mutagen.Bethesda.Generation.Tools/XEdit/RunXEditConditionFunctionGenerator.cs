@@ -41,8 +41,7 @@ public class RunXEditConditionFunctionGenerator
         ConditionFunction[] functions = new ConditionFunctionParser().ReadFunctions(SourceFile).ToArray();
         GenerateParameterType(functions, Path.Combine(OutputFolder, "ParameterType.cs"));
         GenerateGetParameterTypes(functions, Path.Combine(OutputFolder, "GetParameterTypes.cs"));
-        var guidMapping = GetGuidMapping(ReferencePath);
-        GenerateConditionDefinitions(functions, Path.Combine(OutputFolder, "ConditionFunctionDatas.xml"), guidMapping);
+        GenerateConditionDefinitions(functions, Path.Combine(OutputFolder, "ConditionFunctionDatas.xml"));
         GenerateConditionSwitch(functions, Path.Combine(OutputFolder, "ConditionSwitch.cs"));
         GenerateConditionCustomCode(functions, Path.Combine(OutputFolder, "ConditionClasses"));
     }
@@ -127,10 +126,8 @@ public class RunXEditConditionFunctionGenerator
         outputStream.Write(sb.ToString());
     }
     
-    public void GenerateConditionDefinitions(IEnumerable<ConditionFunction> source, FilePath output, Dictionary<string, Guid>? guidMapping)
+    public void GenerateConditionDefinitions(IEnumerable<ConditionFunction> source, FilePath output)
     {
-        int startId = 10000;
-        
         var objs = new List<object>();
         foreach (var function in source)
         {
@@ -187,20 +184,12 @@ public class RunXEditConditionFunctionGenerator
             }
 
             var className = GetClassName(function);
-
-            var guid = guidMapping?.GetOrDefault(className);
-            if (guid == default)
-            {
-                guid = Guid.NewGuid();
-            }
             
             objs.Add(
                 new XElement(XName.Get("Object", LoquiNs),
                     new XAttribute("name", className),
                     new XAttribute("objType", "Subrecord"),
-                    new XAttribute("baseClass", "FunctionConditionData"),
-                    new XAttribute("GUID", guid!.Value),
-                    new XAttribute("ID", startId++),
+                    new XAttribute("baseClass", "ConditionData"),
                     new XElement(XName.Get("Fields", LoquiNs),
                         paramElements)));
         }
@@ -232,17 +221,17 @@ public class RunXEditConditionFunctionGenerator
         {
             case "ptActor":
                 fieldLine = new XElement(
-                    XName.Get("FormLinkOrAlias", LoquiNs),
+                    XName.Get("FormLinkOrIndex", LoquiNs),
                     new XAttribute("refName", "PlacedNpc"));
                 break;
             case "ptActorBase":
                 fieldLine = new XElement(
-                    XName.Get("FormLinkOrAlias", LoquiNs),
+                    XName.Get("FormLinkOrIndex", LoquiNs),
                     new XAttribute("refName", "Npc"));
                 break;
             case "ptObjectReference":
                 fieldLine = new XElement(
-                    XName.Get("FormLinkOrAlias", LoquiNs),
+                    XName.Get("FormLinkOrIndex", LoquiNs),
                     new XElement(XName.Get("Interface", LoquiNs), "IPlacedSimple"));
                 break;
             case "ptAxis":
@@ -250,9 +239,14 @@ public class RunXEditConditionFunctionGenerator
                     XName.Get("Enum", LoquiNs),
                     new XAttribute("enumName", "Axis"));
                 break;
+            case "ptPronoun":
+                fieldLine = new XElement(
+                    XName.Get("Enum", LoquiNs),
+                    new XAttribute("enumName", "Pronoun"));
+                break;
             case "ptActorValue" when category is GameCategory.Fallout4:
                 fieldLine = new XElement(
-                    XName.Get("FormLinkOrAlias", LoquiNs),
+                    XName.Get("FormLinkOrIndex", LoquiNs),
                     new XAttribute("refName", "ActorValueRecord"));
                 break;
             case "ptActorValue":
@@ -262,32 +256,32 @@ public class RunXEditConditionFunctionGenerator
                 break;
             case "ptInventoryObject":
                 fieldLine = new XElement(
-                    XName.Get("FormLinkOrAlias", LoquiNs),
+                    XName.Get("FormLinkOrIndex", LoquiNs),
                     new XElement(XName.Get("Interface", LoquiNs), "IItem"));
                 break;
             case "ptQuest":
                 fieldLine = new XElement(
-                    XName.Get("FormLinkOrAlias", LoquiNs),
+                    XName.Get("FormLinkOrIndex", LoquiNs),
                     new XAttribute("refName", "Quest"));
                 break;
             case "ptFaction":
                 fieldLine = new XElement(
-                    XName.Get("FormLinkOrAlias", LoquiNs),
+                    XName.Get("FormLinkOrIndex", LoquiNs),
                     new XAttribute("refName", "Faction"));
                 break;
             case "ptCell":
                 fieldLine = new XElement(
-                    XName.Get("FormLinkOrAlias", LoquiNs),
+                    XName.Get("FormLinkOrIndex", LoquiNs),
                     new XAttribute("refName", "Cell"));
                 break;
             case "ptClass":
                 fieldLine = new XElement(
-                    XName.Get("FormLinkOrAlias", LoquiNs),
+                    XName.Get("FormLinkOrIndex", LoquiNs),
                     new XAttribute("refName", "Class"));
                 break;
             case "ptRace":
                 fieldLine = new XElement(
-                    XName.Get("FormLinkOrAlias", LoquiNs),
+                    XName.Get("FormLinkOrIndex", LoquiNs),
                     new XAttribute("refName", "Race"));
                 break;
             case "ptSex":
@@ -297,90 +291,121 @@ public class RunXEditConditionFunctionGenerator
                 break;
             case "ptReferencableObject":
                 fieldLine = new XElement(
-                    XName.Get("FormLinkOrAlias", LoquiNs),
+                    XName.Get("FormLinkOrIndex", LoquiNs),
                     new XElement(XName.Get("Interface", LoquiNs), "IPlaceableObject"));
                 break;
             case "ptGlobal":
                 fieldLine = new XElement(
-                    XName.Get("FormLinkOrAlias", LoquiNs),
+                    XName.Get("FormLinkOrIndex", LoquiNs),
                     new XAttribute("refName", "Global"));
                 break;
             case "ptRegion":
                 fieldLine = new XElement(
-                    XName.Get("FormLinkOrAlias", LoquiNs),
+                    XName.Get("FormLinkOrIndex", LoquiNs),
                     new XAttribute("refName", "Region"));
                 break;
             case "ptWeather":
                 fieldLine = new XElement(
-                    XName.Get("FormLinkOrAlias", LoquiNs),
+                    XName.Get("FormLinkOrIndex", LoquiNs),
                     new XAttribute("refName", "Weather"));
                 break;
             case "ptPackage":
                 fieldLine = new XElement(
-                    XName.Get("FormLinkOrAlias", LoquiNs),
+                    XName.Get("FormLinkOrIndex", LoquiNs),
                     new XAttribute("refName", "Package"));
                 break;
             case "ptFurniture":
                 fieldLine = new XElement(
-                    XName.Get("FormLinkOrAlias", LoquiNs),
+                    XName.Get("FormLinkOrIndex", LoquiNs),
                     new XAttribute("refName", "Furniture"));
+                break;
+            case "ptAcousticSpace":
+                fieldLine = new XElement(
+                    XName.Get("FormLinkOrIndex", LoquiNs),
+                    new XAttribute("refName", "AcousticSpace"));
                 break;
             case "ptMagicEffect":
                 fieldLine = new XElement(
-                    XName.Get("FormLinkOrAlias", LoquiNs),
+                    XName.Get("FormLinkOrIndex", LoquiNs),
                     new XAttribute("refName", "MagicEffect"));
                 break;
             case "ptMagicItem":
                 fieldLine = new XElement(
-                    XName.Get("FormLinkOrAlias", LoquiNs),
+                    XName.Get("FormLinkOrIndex", LoquiNs),
                     new XAttribute("refName", "Spell"));
                 break;
             case "ptScene":
                 fieldLine = new XElement(
-                    XName.Get("FormLinkOrAlias", LoquiNs),
+                    XName.Get("FormLinkOrIndex", LoquiNs),
                     new XAttribute("refName", "Scene"));
                 break;
             case "ptLocation":
                 fieldLine = new XElement(
-                    XName.Get("FormLinkOrAlias", LoquiNs),
+                    XName.Get("FormLinkOrIndex", LoquiNs),
                     new XAttribute("refName", "Location"));
                 break;
             case "ptFormList":
                 fieldLine = new XElement(
-                    XName.Get("FormLinkOrAlias", LoquiNs),
+                    XName.Get("FormLinkOrIndex", LoquiNs),
                     new XAttribute("refName", "FormList"));
                 break;
             case "ptOwner":
                 fieldLine = new XElement(
-                    XName.Get("FormLinkOrAlias", LoquiNs),
+                    XName.Get("FormLinkOrIndex", LoquiNs),
                     new XElement(XName.Get("Interface", LoquiNs), "IOwner"));
+                break;
+            case "ptSnapTemplateNode":
+                fieldLine = new XElement(
+                    XName.Get("FormLinkOrIndex", LoquiNs),
+                    new XAttribute("refName", "SnapTemplateNode"));
+                break;
+            case "ptForm":
+                fieldLine = new XElement(
+                    XName.Get("FormLinkOrIndex", LoquiNs),
+                    new XAttribute("refName", $"{category}MajorRecord"));
                 break;
             case "ptWorldSpace":
                 fieldLine = new XElement(
-                    XName.Get("FormLinkOrAlias", LoquiNs),
+                    XName.Get("FormLinkOrIndex", LoquiNs),
                     new XAttribute("refName", "Worldspace"));
                 break;
             case "ptKeyword":
                 fieldLine = new XElement(
-                    XName.Get("FormLinkOrAlias", LoquiNs),
+                    XName.Get("FormLinkOrIndex", LoquiNs),
                     new XAttribute("refName", "Keyword"));
                 break;
             case "ptShout":
                 fieldLine = new XElement(
-                    XName.Get("FormLinkOrAlias", LoquiNs),
+                    XName.Get("FormLinkOrIndex", LoquiNs),
                     new XAttribute("refName", "Shout"));
                 break;
             case "ptVoiceType":
                 fieldLine = new XElement(
-                    XName.Get("FormLinkOrAlias", LoquiNs),
+                    XName.Get("FormLinkOrIndex", LoquiNs),
                     new XAttribute("refName", "VoiceType"));
                 break;
             case "ptEncounterZone":
                 fieldLine = new XElement(
-                    XName.Get("FormLinkOrAlias", LoquiNs),
-                    new XAttribute("refName", "EncounterZone"));
+                    XName.Get("FormLinkOrIndex", LoquiNs),
+                    new XAttribute("refName", category == GameCategory.Starfield ? "StarfieldMajorRecord" : "EncounterZone"));
+                break;
+            case "ptSpeechChallenge":
+                fieldLine = new XElement(
+                    XName.Get("FormLinkOrIndex", LoquiNs),
+                    new XAttribute("refName", "SpeechChallenge"));
+                break;
+            case "ptPlanet":
+                fieldLine = new XElement(
+                    XName.Get("FormLinkOrIndex", LoquiNs),
+                    new XAttribute("refName", "Planet"));
+                break;
+            case "ptDamageType":
+                fieldLine = new XElement(
+                    XName.Get("FormLinkOrIndex", LoquiNs),
+                    new XAttribute("refName", "DamageType"));
                 break;
             case "ptVariableName":
+            case "ptString":
                 fieldLine = new XElement(
                     XName.Get("String", LoquiNs),
                     new XAttribute("nullable", "true"),
@@ -388,12 +413,12 @@ public class RunXEditConditionFunctionGenerator
                 break;
             case "ptPerk":
                 fieldLine = new XElement(
-                    XName.Get("FormLinkOrAlias", LoquiNs),
+                    XName.Get("FormLinkOrIndex", LoquiNs),
                     new XAttribute("refName", "Perk"));
                 break;
             case "ptIdleForm":
                 fieldLine = new XElement(
-                    XName.Get("FormLinkOrAlias", LoquiNs),
+                    XName.Get("FormLinkOrIndex", LoquiNs),
                     new XAttribute("refName", "IdleAnimation"));
                 break;
             case "ptEquipType":
@@ -403,22 +428,37 @@ public class RunXEditConditionFunctionGenerator
                 break;
             case "ptKnowable":
                 fieldLine = new XElement(
-                    XName.Get("FormLinkOrAlias", LoquiNs),
+                    XName.Get("FormLinkOrIndex", LoquiNs),
                     new XElement(XName.Get("Interface", LoquiNs), "IKnowable"));
                 break;
             case "ptAssociationType":
                 fieldLine = new XElement(
-                    XName.Get("FormLinkOrAlias", LoquiNs),
-                    new XAttribute("refName", "AssociationType"));
+                    XName.Get("FormLinkOrIndex", LoquiNs),
+                    new XAttribute("refName", category == GameCategory.Starfield ? "StarfieldMajorRecord": "AssociationType"));
+                break;
+            case "ptResource":
+                fieldLine = new XElement(
+                    XName.Get("FormLinkOrIndex", LoquiNs),
+                    new XAttribute("refName", "Resource"));
                 break;
             case "ptRefType":
                 fieldLine = new XElement(
-                    XName.Get("FormLinkOrAlias", LoquiNs),
+                    XName.Get("FormLinkOrIndex", LoquiNs),
                     new XAttribute("refName", "LocationReferenceType"));
+                break;
+            case "ptConditionForm":
+                fieldLine = new XElement(
+                    XName.Get("FormLinkOrIndex", LoquiNs),
+                    new XAttribute("refName", "ConditionForm"));
+                break;
+            case "ptResearchProject":
+                fieldLine = new XElement(
+                    XName.Get("FormLinkOrIndex", LoquiNs),
+                    new XAttribute("refName", "ResearchProject"));
                 break;
             case "ptEventData":
                 fieldLine = new XElement(
-                    XName.Get("FormLinkOrAlias", LoquiNs),
+                    XName.Get("FormLinkOrIndex", LoquiNs),
                     new XElement(XName.Get("Interface", LoquiNs), "IEventDataTarget"));
                 break;
             case "ptInteger":
@@ -443,6 +483,13 @@ public class RunXEditConditionFunctionGenerator
             case "ptFurnitureEntry":
             case "ptAdvanceAction":
             case "ptCrimeType":
+            case "ptDamageCauseType":
+            case "ptBiomeMask":
+            case "ptPerkCategory":
+            case "ptPerkSkillGroupComparison":
+            case "ptPerkSkillGroup":
+            case "ptReactionType":
+            case "ptLimbCategory":
                 fieldLine = new XElement(XName.Get("Int32", LoquiNs));
                 break;
             case "ptFloat":
@@ -559,14 +606,5 @@ public class RunXEditConditionFunctionGenerator
 
             File.WriteAllText(Path.Combine(output, $"{name}.cs"), sb.ToString());
         }
-    }
-
-    public Dictionary<string, Guid>? GetGuidMapping(FilePath referencePath)
-    {
-        if (!referencePath.Exists) return default;
-        XDocument doc = XDocument.Parse(File.ReadAllText(referencePath));
-        return doc.Elements(XName.Get("Loqui", LoquiNs))
-            .Elements(XName.Get("Object", LoquiNs))
-            .ToDictionary(x => x.GetAttribute("name")!, x => Guid.Parse(x.GetAttribute("GUID")!));
     }
 }
