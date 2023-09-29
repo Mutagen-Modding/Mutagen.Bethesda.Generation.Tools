@@ -36,6 +36,15 @@ public static class EnumConverter
                         throw new ArgumentException();
                     }
                 }
+                if (numberSpan.StartsWith("$"))
+                {
+                    hex = true;
+                    numberSpan = numberSpan.Slice(1);
+                    if (!int.TryParse(numberSpan, NumberStyles.HexNumber, null, out i))
+                    {
+                        throw new ArgumentException();
+                    }
+                }
                 else if (!int.TryParse(numberSpan, out i))
                 {
                     throw new ArgumentException();
@@ -43,7 +52,7 @@ public static class EnumConverter
 
                 span = Utility.SkipPast(span, ", '");
 
-                var name = span.Slice(0, span.IndexOf("\',")).ToString();
+                var name = span.Slice(0, span.IndexOf("\'")).ToString();
 
                 if (name.Contains("Unknown")) continue;
 
