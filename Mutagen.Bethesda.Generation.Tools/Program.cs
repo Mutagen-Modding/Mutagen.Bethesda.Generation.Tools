@@ -18,6 +18,7 @@ try
             typeof(FormLinkTypeFisher),
             typeof(FormLinkInclusionConfirmation),
             typeof(DumpSubrecords),
+            typeof(DumpMajorRecordOrder),
             typeof(AnalyzeSubrecordContent))
         .MapResult(
             async (RunXEditEnumConverter x) =>
@@ -56,6 +57,11 @@ try
                 return 0;
             },
             async (AnalyzeSubrecordContent x) =>
+            {
+                x.Execute();
+                return 0;
+            },
+            async (DumpMajorRecordOrder x) =>
             {
                 x.Execute();
                 return 0;
