@@ -125,12 +125,19 @@ public class RunXEditConditionFunctionGenerator
         using var outputStream = new StreamWriter(File.OpenWrite(output));
         outputStream.Write(sb.ToString());
     }
+
+    private bool ShouldSkip(ConditionFunction function)
+    {
+        return function.Name == "GetEventData";
+    }
     
     public void GenerateConditionDefinitions(IEnumerable<ConditionFunction> source, FilePath output)
     {
         var objs = new List<object>();
         foreach (var function in source)
         {
+            if (ShouldSkip(function)) continue;
+            
             var paramElements = new List<XElement>();
             if (ConvertParamToXElement(function.Param1, "FirstParameter", GameCategory, out var elem))
             {
@@ -182,7 +189,7 @@ public class RunXEditConditionFunctionGenerator
             {
                 throw new NotImplementedException();
             }
-
+            
             var className = GetClassName(function);
             
             objs.Add(
@@ -190,6 +197,7 @@ public class RunXEditConditionFunctionGenerator
                     new XAttribute("name", className),
                     new XAttribute("objType", "Subrecord"),
                     new XAttribute("baseClass", "ConditionData"),
+                    new XAttribute("binaryOverlay", "NoGeneration"),
                     new XElement(XName.Get("Fields", LoquiNs),
                         paramElements)));
         }
@@ -208,7 +216,7 @@ public class RunXEditConditionFunctionGenerator
 
     private bool IsStringParam(string? paramStr)
     {
-        return paramStr == "ptVariableName";
+        return paramStr is "ptVariableName" or "ptString";
     }
 
     private bool ConvertParamToXElement(
@@ -449,7 +457,7 @@ public class RunXEditConditionFunctionGenerator
             case "ptConditionForm":
                 fieldLine = new XElement(
                     XName.Get("FormLinkOrIndex", LoquiNs),
-                    new XAttribute("refName", "ConditionForm"));
+                    new XAttribute("refName", "ConditionRecord"));
                 break;
             case "ptResearchProject":
                 fieldLine = new XElement(
@@ -506,7 +514,6 @@ public class RunXEditConditionFunctionGenerator
     public void GenerateConditionSwitch(IEnumerable<ConditionFunction> source, FilePath output)
     {
         StructuredStringBuilder sb = new();
-        var set = new HashSet<string>();
         sb.AppendLine("public ConditionData CreateFromBinary(MutagenFrame frame, ushort functionIndex)");
         using (sb.CurlyBrace())
         {
@@ -549,6 +556,8 @@ public class RunXEditConditionFunctionGenerator
 
         foreach (var item in source)
         {
+            if (ShouldSkip(item)) continue;
+            
             StructuredStringBuilder sb = new();
             var firstStr = IsStringParam(item.Param1) ? "FirstParameter" : "FirstUnusedStringParameter";
             var secondStr = IsStringParam(item.Param2) ? "SecondParameter" : "SecondUnusedStringParameter";
@@ -585,20 +594,8 @@ public class RunXEditConditionFunctionGenerator
                         sb.AppendLine($"set => {secondStr} = value;");
                     }
                     sb.AppendLine();
-                }
-                sb.AppendLine();
                 
-                using (var c = sb.Class($"{name}BinaryOverlay"))
-                {
-                    c.Partial = true;
-                    c.AccessModifier = AccessModifier.Internal;
-                }
-                using (sb.CurlyBrace())
-                {
-                    sb.AppendLine($"public string? {firstStr} => ParameterOneString;");
-                    sb.AppendLine();
-
-                    sb.AppendLine($"public string? {secondStr} => ParameterTwoString;");
+                    sb.AppendLine($"Condition.Function IConditionDataGetter.Function => Condition.Function.{item.Name};");
                     sb.AppendLine();
                 }
                 sb.AppendLine();
