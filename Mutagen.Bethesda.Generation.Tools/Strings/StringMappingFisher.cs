@@ -81,7 +81,8 @@ public class StringMappingFisher
         using var stream = new MutagenBinaryReadStream(path, Release);
         var modHeader = stream.ReadModHeader();
 
-        if (!Enums.HasFlag(modHeader.Flags, (int)ModHeaderCommonFlag.Localized))
+        var lightIndex = Release.ToCategory().GetLightFlagIndex();
+        if (!Enums.HasFlag(modHeader.Flags, lightIndex!.Value))
         {
             Console.WriteLine($"File is not localized, and so checker will not work as intended: {path}");
             return false;

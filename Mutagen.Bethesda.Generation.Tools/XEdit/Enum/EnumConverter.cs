@@ -54,7 +54,7 @@ public static class EnumConverter
 
                 var name = span.Slice(0, span.IndexOf("\'")).ToString();
 
-                if (name.Contains("Unknown")) continue;
+                if (Filter(name)) continue;
 
                 name = CleanName(name);
 
@@ -74,11 +74,25 @@ public static class EnumConverter
 
     public static string CleanName(string name)
     {
+        if (name.Contains(" - "))
+        {
+            var split = name.Split(" - ");
+            if (int.TryParse(split[0], out var i))
+            {
+                name = split[1];
+            }
+        }
         return name
             .Replace(" ", string.Empty)
             .Replace("/", "Or")
             .Replace("-", string.Empty)
             .Replace("'", string.Empty)
             .Replace("\\", "Or");
+    }
+
+    public static bool Filter(string name)
+    {
+        return name.Contains("Unknown", StringComparison.OrdinalIgnoreCase) 
+               || name.Contains("Unused", StringComparison.OrdinalIgnoreCase);
     }
 }

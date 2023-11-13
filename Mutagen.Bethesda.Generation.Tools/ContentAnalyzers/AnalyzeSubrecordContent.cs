@@ -27,6 +27,12 @@ public class AnalyzeSubrecordContent
     [Option('s', "Sub", Required = true,  HelpText = "SubRecord RecordType to analyze")]
     public string SubRecordType { get; set; } = RecordType.Null.Type;
 
+    [Option('x', "FromIndex", Required = false,  HelpText = "Subsection start index")]
+    public int? FromIndex { get; set; }
+
+    [Option('y', "ToIndex", Required = false,  HelpText = "Subsection end index")]
+    public int? EndIndex { get; set; }
+
     public void Execute()
     {
         using var env = Utility.GetGameEnvironmentState(Release, SourceFile);
@@ -57,7 +63,20 @@ public class AnalyzeSubrecordContent
 
                 foreach (var subRec in majorFrame.FindEnumerateSubrecords(SubRecordType))
                 {
-                    recs.Add(subRec.Content);
+                    var content = subRec.Content;
+                    if (FromIndex != null && EndIndex != null)
+                    {
+                        content = content.Slice(FromIndex.Value, EndIndex.Value - FromIndex.Value);
+                    }
+                    else if (FromIndex != null)
+                    {
+                        content = content.Slice(FromIndex.Value);
+                    }
+                    else if (EndIndex != null)
+                    {
+                        content = content.Slice(0, EndIndex.Value);
+                    }
+                    recs.Add(content);
                 }
             }
             
@@ -72,7 +91,7 @@ public class AnalyzeSubrecordContent
 
             Console.WriteLine("String content:");
             foreach (var str in recs
-                         .Select(x => BinaryStringUtility.ProcessWholeToZString(x, MutagenEncodingProvider.Instance.GetEncoding(Release, Language.English)))
+                         .Select(x => BinaryStringUtility.ProcessWholeToZString(x, MutagenEncoding.GetEncoding(Release, Language.English)))
                          .Distinct()
                          .OrderBy(x => x))
             {

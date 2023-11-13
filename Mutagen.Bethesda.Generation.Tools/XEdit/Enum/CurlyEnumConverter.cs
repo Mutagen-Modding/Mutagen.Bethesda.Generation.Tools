@@ -24,7 +24,7 @@ public static class CurlyEnumConverter
                     throw new ArgumentException();
                 }
 
-                int i;
+                long i;
 
                 var numberSpan = span.Slice(0, numberEndIndex).TrimStart().TrimEnd();
                 bool hex = false;
@@ -32,12 +32,12 @@ public static class CurlyEnumConverter
                 {
                     hex = true;
                     numberSpan = numberSpan.Slice(2);
-                    if (!int.TryParse(numberSpan, NumberStyles.HexNumber, null, out i))
+                    if (!long.TryParse(numberSpan, NumberStyles.HexNumber, null, out i))
                     {
                         throw new ArgumentException();
                     }
                 }
-                else if (!int.TryParse(numberSpan, out i))
+                else if (!long.TryParse(numberSpan, out i))
                 {
                     throw new ArgumentException();
                 }
@@ -46,7 +46,7 @@ public static class CurlyEnumConverter
 
                 var name = span.Slice(0, span.IndexOf('\'')).ToString();
 
-                if (name.Contains("Unknown")) continue;
+                if (EnumConverter.Filter(name)) continue;
 
                 name = EnumConverter.CleanName(name);
 

@@ -262,6 +262,21 @@ public class RunXEditConditionFunctionGenerator
                     XName.Get("Enum", LoquiNs),
                     new XAttribute("enumName", "ActorValue"));
                 break;
+            case "ptPerkCategory":
+                fieldLine = new XElement(
+                    XName.Get("Enum", LoquiNs),
+                    new XAttribute("enumName", "PerkCategory"));
+                break;
+            case "ptPerkSkillGroupComparison":
+                fieldLine = new XElement(
+                    XName.Get("Enum", LoquiNs),
+                    new XAttribute("enumName", "PerkSkillGroup"));
+                break;
+            case "ptPerkSkillGroup":
+                fieldLine = new XElement(
+                    XName.Get("Enum", LoquiNs),
+                    new XAttribute("enumName", "PerkSkillGroup"));
+                break;
             case "ptInventoryObject":
                 fieldLine = new XElement(
                     XName.Get("FormLinkOrIndex", LoquiNs),
@@ -493,9 +508,6 @@ public class RunXEditConditionFunctionGenerator
             case "ptCrimeType":
             case "ptDamageCauseType":
             case "ptBiomeMask":
-            case "ptPerkCategory":
-            case "ptPerkSkillGroupComparison":
-            case "ptPerkSkillGroup":
             case "ptReactionType":
             case "ptLimbCategory":
                 fieldLine = new XElement(XName.Get("Int32", LoquiNs));

@@ -48,6 +48,11 @@
 	    <DefaultPackFolder>content</DefaultPackFolder>
 	    <BuildAction>Compile</BuildAction>
 	  </Compile>
+	  <Compile Update="ContentAnalyzers\OptionalityTester.cs">
+	    <CodeLanguage>cs</CodeLanguage>
+	    <DefaultPackFolder>content</DefaultPackFolder>
+	    <BuildAction>Compile</BuildAction>
+	  </Compile>
 	</ItemGroup>
 
 
