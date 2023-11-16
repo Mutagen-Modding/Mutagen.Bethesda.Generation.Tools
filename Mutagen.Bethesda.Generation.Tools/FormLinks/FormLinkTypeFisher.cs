@@ -21,7 +21,7 @@ public class FormLinkTypeFisher
     [Option('r', "Release", Required = true, HelpText = "GameRelease targeted")]
     public GameRelease Release { get; set; }
 
-    [Option('m', "Major", Required = true, HelpText = "MajorRecord RecordType to search under")]
+    [Option('m', "Major", HelpText = "MajorRecord RecordType to search under")]
     public string MajorRecordType { get; set; } = RecordType.Null.Type;
     
     [Option('s', "Sub", Required = true,  HelpText = "SubRecord RecordType to analyze")]
@@ -63,7 +63,7 @@ public class FormLinkTypeFisher
             Console.WriteLine($"Analyzing target links");
             foreach (var recordLocationMarker in locs.ListedRecords)
             {
-                if (recordLocationMarker.Value.Record != MajorRecordType) continue;
+                if (MajorRecordType != RecordType.Null.Type && recordLocationMarker.Value.Record != MajorRecordType) continue;
                 stream.Position = recordLocationMarker.Key;
                 var majorFrame = stream.ReadMajorRecord();
                 if (majorFrame.IsCompressed)
