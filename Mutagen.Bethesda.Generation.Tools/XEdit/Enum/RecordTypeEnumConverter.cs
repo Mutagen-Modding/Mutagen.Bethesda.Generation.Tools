@@ -25,7 +25,9 @@ public class RecordTypeEnumConverter
                     throw new ArgumentException();
                 }
 
-                var recordTypeSpan = span.Slice(0, recordTypeIndex).TrimStart().TrimEnd();
+                var recordTypeSpan = span.Slice(0, recordTypeIndex)
+                    .TrimStart().TrimEnd()
+                    .TrimStart("'").TrimEnd("'");
                 if (recordTypeSpan.Length != 4)
                 {
                     throw new ArgumentException();
