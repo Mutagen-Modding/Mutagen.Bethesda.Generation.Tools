@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Globalization;
 using Noggog;
 using Noggog.StructuredStrings;
@@ -16,6 +17,11 @@ public static class EnumConverter
             foreach (var line in File.ReadLines(source))
             {
                 var span = line.AsSpan();
+                span = TrimComment(span);
+                if (span.IsWhiteSpace())
+                {
+                    continue;
+                }
 
                 var numberEndIndex = span.IndexOf(",");
                 if (numberEndIndex == -1)
@@ -68,8 +74,11 @@ public static class EnumConverter
             File.Delete(output);
         }
 
-        using var outputStream = new StreamWriter(File.OpenWrite(output));
-        outputStream.Write(sb.ToString());
+        using (var outputStream = new StreamWriter(File.OpenWrite(output)))
+        {
+            outputStream.Write(sb.ToString());
+        }
+        OpenInExplorer(output);
     }
 
     public static string CleanName(string name)
@@ -94,5 +103,23 @@ public static class EnumConverter
     {
         return name.Contains("Unknown", StringComparison.OrdinalIgnoreCase) 
                || name.Contains("Unused", StringComparison.OrdinalIgnoreCase);
+    }
+
+    public static ReadOnlySpan<char> TrimComment(ReadOnlySpan<char> line)
+    {
+        var index = line.IndexOf("//");
+        if (index != -1)
+        {
+            return line.Slice(0, index);
+        }
+
+        return line;
+    }
+
+    public static void OpenInExplorer(string path)
+    {
+        string cmd = "explorer.exe";
+        string arg = "/select, " + path;
+        Process.Start(cmd, arg);
     }
 }
