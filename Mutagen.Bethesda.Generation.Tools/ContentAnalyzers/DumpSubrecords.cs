@@ -37,7 +37,7 @@ public class DumpSubrecords
     
     private class OffsetCounter
     {
-        public Dictionary<RecordType, int> LinkCount = new();
+        public Dictionary<RecordType, (int Times, HashSet<FormKey> Targets)> LinkCount = new();
         public int Count;
     }
     
@@ -141,13 +141,13 @@ public class DumpSubrecords
         foreach (var entry in formLinkFishing
                      .OrderBy(x => x.Key.Type))
         {
-            Console.WriteLine($"  {entry.Key}:");
+            Console.WriteLine($"  {entry.Key} ({subrecordCounter[entry.Key].RecordCount}):");
             foreach (var offsetEntry in entry.Value.OrderBy(x => x.Key))
             {
                 Console.WriteLine($"    Offset {offsetEntry.Key}:");
                 foreach (var linkEntry in offsetEntry.Value.LinkCount)
                 {
-                    Console.WriteLine($"      {linkEntry.Key}: {linkEntry.Value} times");
+                    Console.WriteLine($"      {linkEntry.Key}: {linkEntry.Value.Times} times.  ({linkEntry.Value.Targets.Count} unique)");
                 }
             }
         }
@@ -180,8 +180,12 @@ public class DumpSubrecords
             {
                 var offsetTracker = tracker.GetOrAdd(subRec.RecordType).GetOrAdd(i * 2);
                 offsetTracker.Count++;
-                var linkTracker = offsetTracker.LinkCount.GetOrAdd(otherRec.Record);
-                offsetTracker.LinkCount[otherRec.Record] = linkTracker + 1;
+                var linkTracker = offsetTracker.LinkCount.GetOrAdd(otherRec.Record, () =>
+                {
+                    return (Times: 0, Targets: new());
+                });
+                linkTracker.Targets.Add(link);
+                offsetTracker.LinkCount[otherRec.Record] = (linkTracker.Times + 1, linkTracker.Targets);
             }
 
             content = content.Slice(2);
