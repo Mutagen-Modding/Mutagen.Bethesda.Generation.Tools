@@ -32,5 +32,7 @@ public class Executor
 
         _missingPrinter.Print(missing);
         _trimmedMissingPrinter.Print(missing);
+        
+        Console.WriteLine("DONE");
     }
 }

@@ -5,13 +5,13 @@ using Noggog;
 
 namespace Mutagen.Bethesda.Generation.Tools.FormLinks.InclusionConfirmation;
 
-public record Exclusion(IFormLinkGetter SourceRecord, FormKey MissingLink);
+public record Exclusion(IFormLinkGetter SourceRecord, FormKey? MissingLink);
 
 public record Exclusions(List<Exclusion> Items);
 
 public class ExclusionsProvider
 {
-    private readonly Dictionary<ModKey, Dictionary<IFormLinkIdentifier, HashSet<FormKey>>> _exclusions = new();
+    private readonly Dictionary<ModKey, Dictionary<IFormLinkIdentifier, HashSet<FormKey>?>> _exclusions = new();
 
     public ExclusionsProvider(FormLinkInclusionConfirmation settings)
     {
@@ -42,8 +42,30 @@ public class ExclusionsProvider
         var dict = _exclusions.GetOrAdd(modKey);
         foreach (var exl in exclusions.Items)
         {
-            dict.GetOrAdd(exl.SourceRecord).Add(exl.MissingLink);
+            if (!dict.TryGetValue(exl.SourceRecord, out var set))
+            {
+                set = exl.MissingLink == null ? null : new HashSet<FormKey>();
+                dict[exl.SourceRecord] = set;
+            }
+
+            if (set != null && exl.MissingLink != null)
+            {
+                set.Add(exl.MissingLink.Value);
+            }
         }
+    }
+    
+    public bool Exclude(ModKey modKey, IFormLinkIdentifier sourceLink)
+    {
+        if (_exclusions.Count == 0) return false;
+        if (!_exclusions.TryGetValue(modKey, out var exclusions)
+            && !_exclusions.TryGetValue(ModKey.Null, out exclusions))
+        {
+            return false;
+        }
+
+        if (!exclusions.TryGetValue(sourceLink, out var missingLinks)) return false;
+        return missingLinks == null;
     }
     
     public bool Exclude(ModKey modKey, IFormLinkIdentifier sourceLink, FormKey missingKey)
@@ -57,6 +79,6 @@ public class ExclusionsProvider
 
         if (!exclusions.TryGetValue(sourceLink, out var missingLinks)) return false;
 
-        return missingLinks.Contains(missingKey);
+        return missingLinks?.Contains(missingKey) ?? true;
     }
 }

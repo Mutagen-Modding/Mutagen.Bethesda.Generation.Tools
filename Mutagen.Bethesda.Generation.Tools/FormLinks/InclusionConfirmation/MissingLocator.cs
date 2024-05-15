@@ -1,6 +1,7 @@
 ﻿using Loqui;
 using Mutagen.Bethesda.Generation.Tools.Common;
 using Mutagen.Bethesda.Plugins;
+using Mutagen.Bethesda.Plugins.Exceptions;
 using Mutagen.Bethesda.Plugins.Records;
 using Noggog;
 
@@ -53,33 +54,41 @@ public class MissingLocator
         {
             foreach (var context in mod.EnumerateMajorRecordSimpleContexts(_targetTypeProvider.GetTargetType()))
             {
-                foreach (var link in context.Record.EnumerateFormLinks())
+                if (_exclusionsProvider.Exclude(context.ModKey, context.Record.ToStandardizedIdentifier())) continue;
+                try
                 {
-                    if (_exclusionsProvider.Exclude(mod.ModKey, context.Record.ToStandardizedIdentifier(), link.FormKey)) continue;
-                    // If null, skip
-                    if (link.IsNull) continue;
-                    // If found in typed constraints, skip
-                    if (_environmentProvider.Environment.LinkCache.TryResolve(link.FormKey, link.Type, out _)) continue;
-                    // If not found at all, skip
-                    if (!_environmentProvider.Environment.LinkCache.TryResolve(link.FormKey, typeof(IMajorRecordGetter), out var linked)) continue;
-
-                    var linkedType = linked.GetType();
-                    
-                    if (LoquiRegistration.TryGetRegister(linkedType, out var regis))
+                    foreach (var link in context.Record.EnumerateFormLinks())
                     {
-                        linkedType = regis.ClassType;
-                    }
+                        if (_exclusionsProvider.Exclude(mod.ModKey, context.Record.ToStandardizedIdentifier(), link.FormKey)) continue;
+                        // If null, skip
+                        if (link.IsNull) continue;
+                        // If found in typed constraints, skip
+                        if (_environmentProvider.Environment.LinkCache.TryResolve(link.FormKey, link.Type, out _)) continue;
+                        // If not found at all, skip
+                        if (!_environmentProvider.Environment.LinkCache.TryResolve(link.FormKey, typeof(IMajorRecordGetter), out var linked)) continue;
 
-                    var recordType = LoquiRegistration.GetRegister(context.Record.GetType()).ClassType;
+                        var linkedType = linked.GetType();
                     
-                    lock (missing)
-                    {
-                        missing.SourceToMissingLinks.GetOrAdd(recordType)
-                            .MissingLinkToMods.GetOrAdd(linkedType)
-                            .Mods.GetOrAdd(context.ModKey)
-                            .SourceToMissingLinks.GetOrAdd(context.Record.ToLinkFromRuntimeType())
-                            .Add(link);
+                        if (LoquiRegistration.TryGetRegister(linkedType, out var regis))
+                        {
+                            linkedType = regis.ClassType;
+                        }
+
+                        var recordType = LoquiRegistration.GetRegister(context.Record.GetType()).ClassType;
+                    
+                        lock (missing)
+                        {
+                            missing.SourceToMissingLinks.GetOrAdd(recordType)
+                                .MissingLinkToMods.GetOrAdd(linkedType)
+                                .Mods.GetOrAdd(context.ModKey)
+                                .SourceToMissingLinks.GetOrAdd(context.Record.ToLinkFromRuntimeType())
+                                .Add(link);
+                        }
                     }
+                }
+                catch (Exception e)
+                {
+                    throw RecordException.Enrich(e, mod.ModKey, context.Record);
                 }
             }
         }
