@@ -21,7 +21,8 @@ try
             typeof(DumpMajorRecordOrder),
             typeof(OptionalityTester),
             typeof(StarfieldXtv2TrimLocator),
-            typeof(AnalyzeSubrecordContent))
+            typeof(AnalyzeSubrecordContent),
+            typeof(FindReferencesTo))
         .MapResult(
             async (RunXEditEnumConverter x) =>
             {
@@ -74,6 +75,11 @@ try
                 return 0;
             },
             async (StarfieldXtv2TrimLocator x) =>
+            {
+                x.Execute();
+                return 0;
+            },
+            async (FindReferencesTo x) =>
             {
                 x.Execute();
                 return 0;

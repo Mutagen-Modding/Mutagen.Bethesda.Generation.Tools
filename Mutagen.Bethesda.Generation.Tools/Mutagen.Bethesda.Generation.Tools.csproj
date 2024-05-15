@@ -17,11 +17,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="GitInfo" Version="2.3.0">
+		<PackageReference Include="GitInfo" >
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="NuGetizer" Version="0.9.1">
+		<PackageReference Include="NuGetizer" >
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
@@ -49,6 +49,11 @@
 	    <BuildAction>Compile</BuildAction>
 	  </Compile>
 	  <Compile Update="ContentAnalyzers\OptionalityTester.cs">
+	    <CodeLanguage>cs</CodeLanguage>
+	    <DefaultPackFolder>content</DefaultPackFolder>
+	    <BuildAction>Compile</BuildAction>
+	  </Compile>
+	  <Compile Update="ContentAnalyzers\FindReferencesTo.cs">
 	    <CodeLanguage>cs</CodeLanguage>
 	    <DefaultPackFolder>content</DefaultPackFolder>
 	    <BuildAction>Compile</BuildAction>
