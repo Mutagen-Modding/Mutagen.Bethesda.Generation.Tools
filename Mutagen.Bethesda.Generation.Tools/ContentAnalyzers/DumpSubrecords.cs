@@ -103,7 +103,12 @@ public class DumpSubrecords
 
                     FishForFormLinks(locs, stream.MetaData.MasterReferences, subRec, formLinkFishing);
 
-                    StringMappingFisher.CheckSubrecordIsString(majorFrame.RecordType, stringResults, subRec, stringsOverlay);
+                    StringMappingFisher.CheckSubrecordIsString(
+                        majorFrame.RecordType,
+                        stringResults,
+                        subRec,
+                        stringsOverlay,
+                        index: null);
                 }
 
                 var str = sb.ToString();

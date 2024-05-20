@@ -23,6 +23,9 @@ public class StringMappingFisher
     [Option('m', "Major", Required = false, HelpText = "MajorRecord RecordType to search under")]
     public string? MajorRecordType { get; set; }
 
+    [Option('i', "Index", Required = false, HelpText = "Specific index to look for")]
+    public uint? Index { get; set; }
+
     public record TargetSubrecord(RecordType Major, RecordType SubRecord);
 
     public class StringsSourceDictionary
@@ -58,7 +61,8 @@ public class StringMappingFisher
                     MajorRecordType,
                     path,
                     env.DataFolderPath,
-                    results);
+                    results,
+                    Index);
             }
         }
         else
@@ -69,7 +73,8 @@ public class StringMappingFisher
                 MajorRecordType,
                 SourceFile,
                 Path.GetDirectoryName(SourceFile)!,
-                results);
+                results,
+                Index);
         }
 
         PrintResults(results);
@@ -96,7 +101,8 @@ public class StringMappingFisher
         string? majorRecordType,
         ModPath modPath,
         DirectoryPath dataPath,
-        Dictionary<TargetSubrecord, StringsSourceDictionary> results)
+        Dictionary<TargetSubrecord, StringsSourceDictionary> results,
+        uint? index)
     {        
         using var stream = new MutagenBinaryReadStream(modPath, release);
         
@@ -124,7 +130,7 @@ public class StringMappingFisher
             }
             foreach (var subRec in majorFrame.EnumerateSubrecords())
             {
-                CheckSubrecordIsString(majorFrame.RecordType, results, subRec, stringsOverlay);
+                CheckSubrecordIsString(majorFrame.RecordType, results, subRec, stringsOverlay, index);
             }
         }
     }
@@ -133,11 +139,14 @@ public class StringMappingFisher
         RecordType majorRecType,
         Dictionary<TargetSubrecord, StringsSourceDictionary> results, 
         SubrecordPinFrame subRec,
-        StringsFolderLookupOverlay stringsOverlay)
+        StringsFolderLookupOverlay stringsOverlay,
+        uint? index)
     {
         if (subRec.ContentLength != 4) return;
         var key = subRec.AsUInt32();
         if (key == 0) return;
+
+        if (index.HasValue && index.Value != key) return;
 
         foreach (var source in Enums<StringsSource>.Values)
         {
