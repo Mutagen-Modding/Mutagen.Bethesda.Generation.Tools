@@ -2,6 +2,7 @@
 using Mutagen.Bethesda.Generation.Tools.ContentAnalyzers;
 using Mutagen.Bethesda.Generation.Tools.FormLinks;
 using Mutagen.Bethesda.Generation.Tools.FormLinks.InclusionConfirmation;
+using Mutagen.Bethesda.Generation.Tools.Processing;
 using Mutagen.Bethesda.Generation.Tools.Strings;
 using Mutagen.Bethesda.Generation.Tools.XEdit;
 using Mutagen.Bethesda.Generation.Tools.XEdit.Enum;
@@ -22,7 +23,8 @@ try
             typeof(OptionalityTester),
             typeof(StarfieldXtv2TrimLocator),
             typeof(AnalyzeSubrecordContent),
-            typeof(FindReferencesTo))
+            typeof(FindReferencesTo),
+            typeof(ReferencedAlignment))
         .MapResult(
             async (RunXEditEnumConverter x) =>
             {
@@ -80,6 +82,11 @@ try
                 return 0;
             },
             async (FindReferencesTo x) =>
+            {
+                x.Execute();
+                return 0;
+            },
+            async (ReferencedAlignment x) =>
             {
                 x.Execute();
                 return 0;
