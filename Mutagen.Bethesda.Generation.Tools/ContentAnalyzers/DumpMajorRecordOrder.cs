@@ -1,6 +1,8 @@
 ﻿using CommandLine;
 using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Plugins.Analysis;
+using Mutagen.Bethesda.Plugins.Order;
+using Mutagen.Bethesda.Plugins.Records;
 
 namespace Mutagen.Bethesda.Generation.Tools.ContentAnalyzers;
 
@@ -18,11 +20,16 @@ public class DumpMajorRecordOrder
 
     public void Execute()
     {
+        using var env = Utility.GetGameEnvironmentState(Release, SourceFile);
+        ILoadOrderGetter<IModFlagsGetter> lo = new LoadOrder<IModFlagsGetter>(
+            env.LoadOrder.ListedOrder.ResolveAllModsExist());
+        
         Console.WriteLine($"Checking {SourceFile}");
         Console.WriteLine($"Finding all record locations");
         var locs = RecordLocator.GetLocations(
             SourceFile,
-            Release);
+            Release,
+            lo);
 
         var set = new HashSet<RecordType>();
         var list = new List<RecordType>();

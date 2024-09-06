@@ -5,9 +5,12 @@ using Mutagen.Bethesda.Generation.Tools.Strings;
 using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Plugins.Analysis;
 using Mutagen.Bethesda.Plugins.Binary.Headers;
+using Mutagen.Bethesda.Plugins.Binary.Parameters;
 using Mutagen.Bethesda.Plugins.Binary.Streams;
 using Mutagen.Bethesda.Plugins.Binary.Translations;
 using Mutagen.Bethesda.Plugins.Masters;
+using Mutagen.Bethesda.Plugins.Order;
+using Mutagen.Bethesda.Plugins.Records;
 using Mutagen.Bethesda.Strings;
 using Noggog;
 
@@ -50,10 +53,9 @@ public class DumpSubrecords
     public void Execute()
     {
         using var env = Utility.GetGameEnvironmentState(Release, SourceFile);
-        var modsToCheck = env.LoadOrder.ListedOrder
-            .OnlyEnabledAndExisting()
-            .Select(x => new ModPath(Path.Combine(env.DataFolderPath, x.ModKey.FileName)))
-            .ToList();
+        ILoadOrderGetter<IModFlagsGetter> lo = new LoadOrder<IModFlagsGetter>(
+            env.LoadOrder.ListedOrder.ResolveAllModsExist());
+        var modsToCheck = Utility.GetModsToCheck(env, SourceFile);
         var subrecordCounter = new Dictionary<RecordType, LengthCounter>();
         var printedStrings = new HashSet<string>();
         var formLinkFishing = new Dictionary<RecordType, Dictionary<int, OffsetCounter>>();
@@ -64,8 +66,11 @@ public class DumpSubrecords
             Console.WriteLine($"Finding all record locations");
             var locs = RecordLocator.GetLocations(
                 modPath,
-                Release);
-            using var stream = new MutagenBinaryReadStream(modPath, Release);
+                Release,
+                lo);
+            using var stream = new MutagenBinaryReadStream(
+                modPath, 
+                ParsingMeta.Factory(BinaryReadParameters.Default, Release, modPath));
             Console.WriteLine($"Dumping data");
         
             var stringsOverlay = StringsFolderLookupOverlay.TypicalFactory(
@@ -165,7 +170,7 @@ public class DumpSubrecords
 
     private void FishForFormLinks(
         RecordLocatorResults locs,
-        IMasterReferenceCollection masters,
+        IReadOnlySeparatedMasterPackage masters,
         SubrecordPinFrame subRec,
         Dictionary<RecordType, Dictionary<int, OffsetCounter>> tracker)
     {

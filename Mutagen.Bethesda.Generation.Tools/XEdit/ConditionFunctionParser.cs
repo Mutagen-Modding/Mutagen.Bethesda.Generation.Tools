@@ -47,12 +47,12 @@ public class ConditionFunctionParser
 
     public string RemoveComments(string str)
     {
-        int index = str.IndexOf("{");
+        int index = str.IndexOf("{", StringComparison.OrdinalIgnoreCase);
         while (index != -1)
         {
             int endIndex = str.IndexOf("}", index);
             str = str.Substring(0, index) + str.Substring(endIndex + 1);
-            index = str.IndexOf("{");
+            index = str.IndexOf("{", StringComparison.OrdinalIgnoreCase);
         }
 
         return str;

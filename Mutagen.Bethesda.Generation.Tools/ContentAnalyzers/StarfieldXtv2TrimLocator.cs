@@ -2,7 +2,10 @@
 using CommandLine;
 using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Plugins.Analysis;
+using Mutagen.Bethesda.Plugins.Binary.Parameters;
 using Mutagen.Bethesda.Plugins.Binary.Streams;
+using Mutagen.Bethesda.Plugins.Order;
+using Mutagen.Bethesda.Plugins.Records;
 using Mutagen.Bethesda.Plugins.Utility;
 using Mutagen.Bethesda.Starfield.Internals;
 using Noggog;
@@ -22,16 +25,22 @@ public class StarfieldXtv2TrimLocator
     {
         Console.WriteLine($"Checking {SourceFile}");
         Console.WriteLine($"Finding all record locations");
+        using var env = Utility.GetGameEnvironmentState(Release, SourceFile);
+        ILoadOrderGetter<IModFlagsGetter> lo = new LoadOrder<IModFlagsGetter>(
+            env.LoadOrder.ListedOrder.ResolveAllModsExist());
         var locs = RecordLocator.GetLocations(
             SourceFile,
             Release,
+            lo,
             new RecordInterest(interestingTypes: new []
             {
                 RecordTypes.REFR,
                 RecordTypes.CELL
             }));
 
-        using var stream = new MutagenBinaryReadStream(SourceFile, Release);
+        using var stream = new MutagenBinaryReadStream(
+            SourceFile, 
+            ParsingMeta.Factory(BinaryReadParameters.Default, Release, SourceFile));
 
         var xtv2RecType = new RecordType("XTV2");
         
@@ -47,9 +56,6 @@ public class StarfieldXtv2TrimLocator
             }
 
             int loc = 0;
-            if (majorFrame.FormID.ID == 0x24271E)
-            {
-            }
             if (majorFrame.TryFindSubrecord(xtv2RecType, out var xtv2))
             {
                 while (xtv2.ContentLength > loc)
@@ -57,7 +63,7 @@ public class StarfieldXtv2TrimLocator
                     if (CheckIfIsFluff(xtv2.Content.Slice(loc), out var hasFormLink))
                     {
                         int cut = xtv2.ContentLength - loc;
-                        list.Add(new KeyValue<uint, int>(majorFrame.FormID.ID, cut));
+                        list.Add(new KeyValue<uint, int>(majorFrame.FormID.FullId, cut));
                         break;
                     }
 

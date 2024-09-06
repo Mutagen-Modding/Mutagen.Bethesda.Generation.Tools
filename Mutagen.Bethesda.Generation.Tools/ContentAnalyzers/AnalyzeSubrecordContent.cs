@@ -1,8 +1,12 @@
 ﻿using CommandLine;
 using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Plugins.Analysis;
+using Mutagen.Bethesda.Plugins.Binary.Parameters;
 using Mutagen.Bethesda.Plugins.Binary.Streams;
 using Mutagen.Bethesda.Plugins.Binary.Translations;
+using Mutagen.Bethesda.Plugins.Masters;
+using Mutagen.Bethesda.Plugins.Order;
+using Mutagen.Bethesda.Plugins.Records;
 using Mutagen.Bethesda.Strings;
 using Mutagen.Bethesda.Strings.DI;
 using Noggog;
@@ -36,10 +40,9 @@ public class AnalyzeSubrecordContent
     public void Execute()
     {
         using var env = Utility.GetGameEnvironmentState(Release, SourceFile);
-        var modsToCheck = env.LoadOrder.ListedOrder
-            .OnlyEnabledAndExisting()
-            .Select(x => new ModPath(Path.Combine(env.DataFolderPath, x.ModKey.FileName)))
-            .ToList();
+        var modsToCheck = Utility.GetModsToCheck(env, SourceFile);
+        ILoadOrderGetter<IModFlagsGetter> lo = new LoadOrder<IModFlagsGetter>(
+            env.LoadOrder.ListedOrder.ResolveAllModsExist());
         
         foreach (var modPath in modsToCheck)
         {
@@ -47,8 +50,11 @@ public class AnalyzeSubrecordContent
             Console.WriteLine($"Finding all record locations");
             var locs = RecordLocator.GetLocations(
                 modPath,
-                Release);
-            using var stream = new MutagenBinaryReadStream(modPath, Release);
+                Release,
+                lo);
+            using var stream = new MutagenBinaryReadStream(
+                modPath, 
+                ParsingMeta.Factory(BinaryReadParameters.Default, Release, modPath));
             Console.WriteLine($"Dumping data");
             List<ReadOnlyMemorySlice<byte>> recs = new();
             foreach (var recordLocationMarker in locs.ListedRecords)

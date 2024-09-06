@@ -3,7 +3,9 @@ using Mutagen.Bethesda.Environments;
 using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Plugins.Analysis;
 using Mutagen.Bethesda.Plugins.Binary.Headers;
+using Mutagen.Bethesda.Plugins.Binary.Parameters;
 using Mutagen.Bethesda.Plugins.Binary.Streams;
+using Mutagen.Bethesda.Plugins.Order;
 using Mutagen.Bethesda.Plugins.Records;
 using Mutagen.Bethesda.Plugins.Utility;
 using Mutagen.Bethesda.Strings;
@@ -55,7 +57,7 @@ public class StringMappingFisher
             {
                 if (!mod.Enabled) continue;
                 var path = ModPath.FromPath(Path.Combine(env.DataFolderPath, mod.ModKey.FileName));
-                if (!CheckModIsLocalized(path)) continue;
+                if (!CheckModIsLocalized(path, Release)) continue;
                 FillResults(
                     Release,
                     MajorRecordType,
@@ -67,7 +69,7 @@ public class StringMappingFisher
         }
         else
         {
-            if (!CheckModIsLocalized(SourceFile)) return;
+            if (!CheckModIsLocalized(SourceFile, Release)) return;
             FillResults(
                 Release,
                 MajorRecordType,
@@ -81,9 +83,11 @@ public class StringMappingFisher
         Console.WriteLine("Done");
     }
 
-    private bool CheckModIsLocalized(ModPath path)
+    private bool CheckModIsLocalized(ModPath path, GameRelease release)
     {
-        using var stream = new MutagenBinaryReadStream(path, Release);
+        using var stream = new MutagenBinaryReadStream(
+            path, 
+            ParsingMeta.Factory(BinaryReadParameters.Default, release, path));
         var modHeader = stream.ReadModHeader();
 
         var localizedIndex = Release.ToCategory().GetLocalizedFlagIndex();
@@ -104,7 +108,13 @@ public class StringMappingFisher
         Dictionary<TargetSubrecord, StringsSourceDictionary> results,
         uint? index)
     {        
-        using var stream = new MutagenBinaryReadStream(modPath, release);
+        using var env = Utility.GetGameEnvironmentState(release, modPath);
+        ILoadOrderGetter<IModFlagsGetter> lo = new LoadOrder<IModFlagsGetter>(
+            env.LoadOrder.ListedOrder.ResolveAllModsExist());
+        
+        using var stream = new MutagenBinaryReadStream(
+            modPath, 
+            ParsingMeta.Factory(BinaryReadParameters.Default, release, modPath));
         
         var stringsOverlay = StringsFolderLookupOverlay.TypicalFactory(
             release,
@@ -116,6 +126,7 @@ public class StringMappingFisher
         var locs = RecordLocator.GetLocations(
             modPath,
             release,
+            lo,
             majorRecordType == null ? null : new RecordInterest(majorRecordType));
 
         Console.WriteLine($"Analyzing subrecords for strings in {modPath}...");
