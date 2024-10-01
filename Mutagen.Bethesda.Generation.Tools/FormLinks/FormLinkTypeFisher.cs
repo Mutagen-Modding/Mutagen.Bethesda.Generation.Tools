@@ -53,15 +53,29 @@ public class FormLinkTypeFisher
         ILoadOrderGetter<IModFlagsGetter> lo = new LoadOrder<IModFlagsGetter>(
             env.LoadOrder.ListedOrder.ResolveAllModsExist());
         var targetedTypes = new FormLinkFisherDictionary();
-        bool isLikelyString = true;
+        var lookup = new Dictionary<FormKey, RecordLocationMarker>();
+        var locsLookup = new Dictionary<ModKey, RecordLocatorResults>();
+
         foreach (var modPath in modsToCheck)
         {
-            Console.WriteLine($"Checking {modPath}");
-            Console.WriteLine($"Finding all record locations");
+            Console.WriteLine($"Finding all record locations in {modPath}");
             var locs = RecordLocator.GetLocations(
                 modPath,
                 Release,
                 lo);
+            locsLookup[modPath.ModKey] = locs;
+        }
+
+        lookup = locsLookup.Values
+            .SelectMany(x => x.ListedRecords.Values)
+            .DistinctBy(x => x.FormKey)
+            .ToDictionary(x => x.FormKey, x => x);
+
+        bool isLikelyString = true;
+        foreach (var modPath in modsToCheck)
+        {
+            Console.WriteLine($"Checking {modPath}");
+            var locs = locsLookup[modPath.ModKey];
             using var stream = new MutagenBinaryReadStream(
                 modPath, 
                 ParsingMeta.Factory(BinaryReadParameters.Default, Release, modPath));
@@ -81,10 +95,10 @@ public class FormLinkTypeFisher
                     var times = RepeatEvery == null ? 1 : subRec.ContentLength / RepeatEvery;
                     for (int i = 0; i < times; i++)
                     {
-                        var link = FormKeyBinaryTranslation.Instance.Parse(
+                        var formKey = FormKeyBinaryTranslation.Instance.Parse(
                             content.Slice(Offset),
                             stream.MetaData.MasterReferences);
-                        if (!link.IsNull && locs.TryGetRecord(link, out var otherRec))
+                        if (!formKey.IsNull && lookup.TryGetValue(formKey, out var otherRec))
                         {
                             var cur = targetedTypes.ByLinkedRecordType.GetOrAdd(otherRec.Record);
                             cur.Count++;
