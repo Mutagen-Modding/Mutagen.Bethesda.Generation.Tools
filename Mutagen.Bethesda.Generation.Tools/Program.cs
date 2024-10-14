@@ -24,7 +24,8 @@ try
             typeof(StarfieldXtv2TrimLocator),
             typeof(AnalyzeSubrecordContent),
             typeof(FindReferencesTo),
-            typeof(ReferencedAlignment))
+            typeof(ReferencedAlignment),
+            typeof(StringSourceTester))
         .MapResult(
             async (RunXEditEnumConverter x) =>
             {
@@ -87,6 +88,11 @@ try
                 return 0;
             },
             async (ReferencedAlignment x) =>
+            {
+                x.Execute();
+                return 0;
+            },
+            async (StringSourceTester x) =>
             {
                 x.Execute();
                 return 0;

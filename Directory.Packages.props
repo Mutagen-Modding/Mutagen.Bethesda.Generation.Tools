@@ -2,25 +2,25 @@
   <ItemGroup>
     <PackageVersion Include="CommandLineParser" Version="2.9.1" />
     <PackageVersion Include="Loqui.Generation">
-      <Version>[2.64.0-nightly-20240727-092951]</Version>
+      <Version>[2.66]</Version>
     </PackageVersion>
     <PackageVersion Include="Mutagen.Bethesda.Json">
       <Version>[0.42.0.1-nightly-20230906-100517]</Version>
     </PackageVersion>
     <PackageVersion Include="Noggog.Autofac">
-      <Version>[2.65.0-nightly-20240727-092271]</Version>
+      <Version>[2.65.1-nightly-20241010-092782]</Version>
     </PackageVersion>
     <PackageVersion Include="Noggog.CSharpExt">
-      <Version>[2.65.0-nightly-20240727-092271]</Version>
+      <Version>[2.65.1-nightly-20241010-092782]</Version>
     </PackageVersion>
     <PackageVersion Include="Mutagen.Bethesda">
-      <Version>[0.46.0.1-nightly-20240903-095778]</Version>
+      <Version>[0.47.4]</Version>
     </PackageVersion>
     <PackageVersion Include="Microsoft.NET.Test.Sdk">
       <Version>17.7.2</Version>
     </PackageVersion>
     <PackageVersion Include="Noggog.Testing">
-      <Version>[2.65.0-nightly-20240727-092271]</Version>
+      <Version>[2.65.1-nightly-20241010-092782]</Version>
     </PackageVersion>
     <PackageVersion Include="xunit">
       <Version>2.5.0</Version>
