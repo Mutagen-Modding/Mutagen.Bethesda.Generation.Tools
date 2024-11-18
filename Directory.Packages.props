@@ -1,47 +1,38 @@
 <Project>
   <ItemGroup>
     <PackageVersion Include="CommandLineParser" Version="2.9.1" />
+      <PackageVersion Include="GitVersion.MsBuild" Version="6.0.5" />
     <PackageVersion Include="Loqui.Generation">
-      <Version>[2.66]</Version>
+      <Version>[2.69]</Version>
     </PackageVersion>
     <PackageVersion Include="Mutagen.Bethesda.Json">
-      <Version>[0.42.0.1-nightly-20230906-100517]</Version>
+      <Version>[0.48.0-alpha.13]</Version>
     </PackageVersion>
     <PackageVersion Include="Noggog.Autofac">
-      <Version>[2.65.1-nightly-20241010-092782]</Version>
+      <Version>[2.69]</Version>
     </PackageVersion>
     <PackageVersion Include="Noggog.CSharpExt">
-      <Version>[2.65.1-nightly-20241010-092782]</Version>
+      <Version>[2.69]</Version>
     </PackageVersion>
     <PackageVersion Include="Mutagen.Bethesda">
-      <Version>[0.47.4]</Version>
+      <Version>[0.48.0-alpha.13]</Version>
     </PackageVersion>
     <PackageVersion Include="Microsoft.NET.Test.Sdk">
-      <Version>17.7.2</Version>
+      <Version>17.11.1</Version>
     </PackageVersion>
     <PackageVersion Include="Noggog.Testing">
-      <Version>[2.65.1-nightly-20241010-092782]</Version>
+      <Version>[2.69]</Version>
     </PackageVersion>
     <PackageVersion Include="xunit">
-      <Version>2.5.0</Version>
+      <Version>2.9.2</Version>
     </PackageVersion>
     <PackageVersion Include="xunit.runner.console">
-      <Version>2.5.0</Version>
+      <Version>2.9.2</Version>
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageVersion>
     <PackageVersion Include="xunit.runner.visualstudio">
-      <Version>2.5.0</Version>
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageVersion>
-    <PackageVersion Include="GitInfo">
-      <Version>3.3.3</Version>
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageVersion>
-    <PackageVersion Include="NuGetizer">
-      <Version>1.1.1</Version>
+      <Version>2.8.2</Version>
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageVersion>
