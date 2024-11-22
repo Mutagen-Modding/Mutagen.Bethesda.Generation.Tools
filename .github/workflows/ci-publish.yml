@@ -1,9 +1,6 @@
 name: Publish
 
 on:
-  schedule:
-    - cron: '40 9 * * *'
-  workflow_dispatch:
   release:
     types: [published]
     inputs:
@@ -12,37 +9,8 @@ on:
         required: true
         default: 'false'
 
-jobs:
-  activity-short-circuit:
-    runs-on: ubuntu-latest
-    outputs:
-      same_sha: ${{ steps.check.outputs.same_sha }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          
-      - name: Get Activity Short Circuit
-        id: check
-        run: |
-          echo "Event name: ${{ github.event_name }}"
-          git branch -a
-          git fetch origin nightly:nightly
-          head_sha=$(git rev-parse --verify HEAD)
-          nightly_sha=$(git rev-parse --verify nightly)
-          if [[ "$head_sha" == "$nightly_sha" && ${{ github.event_name }} != "release" ]]; then
-              same_sha=true;
-          else
-              same_sha=false;
-          fi
-          echo "head_sha=$head_sha"
-          echo "nightly_sha=$nightly_sha"
-          echo "same_sha=${same_sha}"
-          echo "same_sha=${same_sha}" >> $GITHUB_OUTPUT
-        
+jobs:        
   build-test:
-    needs: activity-short-circuit
-    if: needs.activity-short-circuit.outputs.same_sha == 'false'
     runs-on: ${{ matrix.os }}
     
     strategy:
@@ -123,21 +91,4 @@ jobs:
         file: MutagenGenerationTools.zip
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         tag: ${{ github.event.release.tag_name }}
-    - name: Publish to Nuget.org
-      run: dotnet nuget push **/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --no-symbols
   
-  update-nightly:
-    needs: [build-test-push, activity-short-circuit]
-    if: needs.activity-short-circuit.outputs.same_sha == 'false'
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-    - name: Reset nightly to release
-      run: |
-        head_sha=$(git rev-parse --verify HEAD)
-        echo "head_sha=$head_sha"
-        git checkout nightly
-        git reset --hard $head_sha
-        git push
