@@ -71,11 +71,11 @@ jobs:
     - name: Archive Linux CLI
       if: ${{ success() && !github.event.release.prerelease && github.event_name == 'release' }}
       run: |
-        powershell Compress-Archive Mutagen.Bethesda.Generation.Tools/bin/Release/net8.0/linux-x64/publish/* MutagenGenerationTools-Linux.zip
+        powershell Compress-Archive Mutagen.Bethesda.Generation.Tools/bin/Release/net9.0/linux-x64/publish/* MutagenGenerationTools-Linux.zip
     - name: Archive CLI
       if: ${{ success() && !github.event.release.prerelease && github.event_name == 'release' }}
       run: |
-        powershell Compress-Archive Mutagen.Bethesda.Generation.Tools/bin/Release/net8.0/win-x64/publish/* MutagenGenerationTools.zip
+        powershell Compress-Archive Mutagen.Bethesda.Generation.Tools/bin/Release/net9.0/win-x64/publish/* MutagenGenerationTools.zip
     - name: Publish Linux CLI to Github
       if: ${{ success() && !github.event.release.prerelease && github.event_name == 'release' }}
       uses: svenstaro/upload-release-action@v2
