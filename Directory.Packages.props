@@ -1,12 +1,12 @@
 <Project>
   <ItemGroup>
     <PackageVersion Include="CommandLineParser" Version="2.9.1" />
-      <PackageVersion Include="GitVersion.MsBuild" Version="6.0.5" />
+    <PackageVersion Include="GitVersion.MsBuild" Version="6.0.5" />
     <PackageVersion Include="Loqui.Generation">
       <Version>[2.69]</Version>
     </PackageVersion>
     <PackageVersion Include="Mutagen.Bethesda.Json">
-      <Version>[0.48.0-alpha.13]</Version>
+      <Version>[0.48.0]</Version>
     </PackageVersion>
     <PackageVersion Include="Noggog.Autofac">
       <Version>[2.69]</Version>
@@ -17,9 +17,7 @@
     <PackageVersion Include="Mutagen.Bethesda">
       <Version>[0.48.0]</Version>
     </PackageVersion>
-    <PackageVersion Include="Microsoft.NET.Test.Sdk">
-      <Version>17.11.1</Version>
-    </PackageVersion>
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
     <PackageVersion Include="Noggog.Testing">
       <Version>[2.69]</Version>
     </PackageVersion>
