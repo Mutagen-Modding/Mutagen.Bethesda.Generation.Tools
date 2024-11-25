@@ -1,10 +1,13 @@
 ﻿using System.Buffers.Binary;
+using System.IO.Abstractions;
 using CommandLine;
+using Mutagen.Bethesda.Environments.DI;
 using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Plugins.Analysis;
 using Mutagen.Bethesda.Plugins.Binary.Parameters;
 using Mutagen.Bethesda.Plugins.Binary.Streams;
 using Mutagen.Bethesda.Plugins.Binary.Translations;
+using Mutagen.Bethesda.Plugins.Masters.DI;
 using Mutagen.Bethesda.Plugins.Order;
 using Mutagen.Bethesda.Plugins.Records;
 using Mutagen.Bethesda.Plugins.Records.Internals;
@@ -42,9 +45,18 @@ public class ConditionFormLinkTypeFisher
                 modPath,
                 Release,
                 lo);
+            
+            var masterFlagsCompiler = new MasterFlagsLookupCompiler(
+                new FileSystem(),
+                new GameReleaseInjection(Release),
+                new DataDirectoryInjection(env.DataFolderPath));
+            
             using var stream = new MutagenBinaryReadStream(
                 modPath, 
-                ParsingMeta.Factory(BinaryReadParameters.Default, Release, modPath));
+                ParsingMeta.Factory(BinaryReadParameters.Default with
+                {
+                    MasterFlagsLookup = masterFlagsCompiler.ConstructFor(modPath)
+                }, Release, modPath));
             Console.WriteLine($"Analyzing target links");
             foreach (var recordLocationMarker in locs.ListedRecords)
             {

@@ -1,10 +1,13 @@
+using System.IO.Abstractions;
 using CommandLine;
 using Mutagen.Bethesda.Environments;
+using Mutagen.Bethesda.Environments.DI;
 using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Plugins.Analysis;
 using Mutagen.Bethesda.Plugins.Binary.Headers;
 using Mutagen.Bethesda.Plugins.Binary.Parameters;
 using Mutagen.Bethesda.Plugins.Binary.Streams;
+using Mutagen.Bethesda.Plugins.Masters.DI;
 using Mutagen.Bethesda.Plugins.Order;
 using Mutagen.Bethesda.Plugins.Records;
 using Mutagen.Bethesda.Plugins.Utility;
@@ -111,10 +114,18 @@ public class StringMappingFisher
         using var env = Utility.GetGameEnvironmentState(release, modPath);
         ILoadOrderGetter<IModFlagsGetter> lo = new LoadOrder<IModFlagsGetter>(
             env.LoadOrder.ListedOrder.ResolveAllModsExist());
+            
+        var masterFlagsCompiler = new MasterFlagsLookupCompiler(
+            new FileSystem(),
+            new GameReleaseInjection(release),
+            new DataDirectoryInjection(env.DataFolderPath));
         
         using var stream = new MutagenBinaryReadStream(
             modPath, 
-            ParsingMeta.Factory(BinaryReadParameters.Default, release, modPath));
+            ParsingMeta.Factory(BinaryReadParameters.Default with
+            {
+                MasterFlagsLookup = masterFlagsCompiler.ConstructFor(modPath)
+            }, release, modPath));
         
         var stringsOverlay = StringsFolderLookupOverlay.TypicalFactory(
             release,

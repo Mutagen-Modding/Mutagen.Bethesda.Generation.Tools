@@ -1,9 +1,12 @@
 ﻿using System.Buffers.Binary;
+using System.IO.Abstractions;
 using CommandLine;
+using Mutagen.Bethesda.Environments.DI;
 using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Plugins.Analysis;
 using Mutagen.Bethesda.Plugins.Binary.Parameters;
 using Mutagen.Bethesda.Plugins.Binary.Streams;
+using Mutagen.Bethesda.Plugins.Masters.DI;
 using Mutagen.Bethesda.Plugins.Order;
 using Mutagen.Bethesda.Plugins.Records;
 using Mutagen.Bethesda.Plugins.Utility;
@@ -38,9 +41,17 @@ public class StarfieldXtv2TrimLocator
                 RecordTypes.CELL
             }));
 
+        var masterFlagsCompiler = new MasterFlagsLookupCompiler(
+            new FileSystem(),
+            new GameReleaseInjection(Release),
+            new DataDirectoryInjection(env.DataFolderPath));
+
         using var stream = new MutagenBinaryReadStream(
             SourceFile, 
-            ParsingMeta.Factory(BinaryReadParameters.Default, Release, SourceFile));
+            ParsingMeta.Factory(BinaryReadParameters.Default with
+            {
+                MasterFlagsLookup = masterFlagsCompiler.ConstructFor(SourceFile)
+            }, Release, SourceFile));
 
         var xtv2RecType = new RecordType("XTV2");
         

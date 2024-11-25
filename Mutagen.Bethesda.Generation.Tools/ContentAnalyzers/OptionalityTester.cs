@@ -1,5 +1,7 @@
-﻿using System.Text;
+﻿using System.IO.Abstractions;
+using System.Text;
 using CommandLine;
+using Mutagen.Bethesda.Environments.DI;
 using Mutagen.Bethesda.Generation.Tools.FormLinks;
 using Mutagen.Bethesda.Generation.Tools.Strings;
 using Mutagen.Bethesda.Plugins;
@@ -9,6 +11,7 @@ using Mutagen.Bethesda.Plugins.Binary.Parameters;
 using Mutagen.Bethesda.Plugins.Binary.Streams;
 using Mutagen.Bethesda.Plugins.Binary.Translations;
 using Mutagen.Bethesda.Plugins.Masters;
+using Mutagen.Bethesda.Plugins.Masters.DI;
 using Mutagen.Bethesda.Plugins.Order;
 using Mutagen.Bethesda.Plugins.Records;
 using Mutagen.Bethesda.Strings;
@@ -49,9 +52,18 @@ public class OptionalityTester
                 modPath,
                 Release,
                 lo);
+
+            var masterFlagsCompiler = new MasterFlagsLookupCompiler(
+                new FileSystem(),
+                new GameReleaseInjection(Release),
+                new DataDirectoryInjection(env.DataFolderPath));
+            
             using var stream = new MutagenBinaryReadStream(
                 modPath, 
-                ParsingMeta.Factory(BinaryReadParameters.Default, Release, modPath));
+                ParsingMeta.Factory(BinaryReadParameters.Default with
+                {
+                    MasterFlagsLookup = masterFlagsCompiler.ConstructFor(modPath)
+                }, Release, modPath));
         
             foreach (var recordLocationMarker in locs.ListedRecords)
             {
