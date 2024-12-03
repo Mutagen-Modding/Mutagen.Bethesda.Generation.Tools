@@ -7,7 +7,6 @@ using Mutagen.Bethesda.Plugins.Binary.Parameters;
 using Mutagen.Bethesda.Plugins.Binary.Streams;
 using Mutagen.Bethesda.Plugins.Records;
 using Mutagen.Bethesda.Plugins.Records.Mapping;
-using Mutagen.Bethesda.Skyrim;
 using Mutagen.Bethesda.Strings;
 using Noggog;
 using RecordTypes = Mutagen.Bethesda.Skyrim.Internals.RecordTypes;
@@ -50,7 +49,9 @@ public class StringSourceTester
         
         if (SourceFile == ModPath.Empty)
         {
-            using var env = GameEnvironment.Typical.Construct(Release);
+            using var env = GameEnvironment.Typical.Builder(Release)
+                .TransformModListings(x => x.Where(x => x.Enabled))
+                .Build();
             var context = env.LinkCache.ResolveSimpleContext(FormKey, targetType);
             Test(Path.Combine(env.DataFolderPath, context.ModKey.FileName), env.DataFolderPath, targetType);
         }
