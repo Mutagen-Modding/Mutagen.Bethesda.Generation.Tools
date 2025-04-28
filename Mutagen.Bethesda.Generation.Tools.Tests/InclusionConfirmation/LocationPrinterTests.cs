@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Mutagen.Bethesda.Generation.Tools.FormLinks.InclusionConfirmation;
+﻿using Mutagen.Bethesda.Generation.Tools.FormLinks.InclusionConfirmation;
 using Mutagen.Bethesda.Fallout4;
 using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Plugins.Binary.Parameters;
