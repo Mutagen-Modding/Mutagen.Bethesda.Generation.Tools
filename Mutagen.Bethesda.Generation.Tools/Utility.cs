@@ -60,4 +60,15 @@ public static class Utility
 
         return str.Slice(index + target.Length);
     }
+
+    public static ReadOnlySpan<char> SkipPastIfContains(ReadOnlySpan<char> str, string target)
+    {
+        var index = str.IndexOf(target);
+        if (index == -1)
+        {
+            return str;
+        }
+
+        return str.Slice(index + target.Length);
+    }
 }

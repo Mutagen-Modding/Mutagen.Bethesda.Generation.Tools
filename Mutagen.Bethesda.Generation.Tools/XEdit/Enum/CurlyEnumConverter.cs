@@ -42,7 +42,8 @@ public static class CurlyEnumConverter
                     throw new ArgumentException();
                 }
 
-                span = Utility.SkipPast(span, "} '");
+                span = Utility.SkipPastIfContains(span, "}  '");
+                span = Utility.SkipPastIfContains(span, "} '");
 
                 var name = span.Slice(0, span.IndexOf('\'')).ToString();
 
